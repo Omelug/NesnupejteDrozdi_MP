@@ -12,7 +12,6 @@ import org.drozdi.levels.level3.walls.Key;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Point;
 import java.util.ArrayList;
 
 @Data
@@ -21,8 +20,7 @@ public class Level3 {
 	@Getter @Setter
 	private static Thread thread;
 	private boolean end = true;
-	private Point defaultPosition, screenPosition, defaultScreenPosition;
-	private Point shift;
+	//private Point2D.Double shift;
 	private ArrayList<Key> savedKeyList;
 	JLabel infoLabel;
 	private int deathCount = 0;
@@ -33,14 +31,11 @@ public class Level3 {
 	public Level3(Window window) {
 		this.window = window;
 		map = NesnupejteDrozdi.getLevel3Level();
-		window.setTitle("Šňupejte droždí  - Level 3 - CESTA DOMŮ");
-		zaklad(window);
+		window.setTitle("Šňupejte droždí  - Level 3");
+		base(window);
 		new FileManager_lvl3();
 
-		defaultScreenPosition = new Point(13, 10);
-		screenPosition = new Point(13, 10);
-		defaultPosition = (Point) screenPosition.clone();
-		shift = new Point(0, 0);
+		//shift = new Point2D.Double(0, 0);
 		window.repaint();
 		cas = System.currentTimeMillis();
 		do {
@@ -50,13 +45,14 @@ public class Level3 {
 				try {
 					thread.wait();
 				} catch (InterruptedException ex) {
-					System.out.println("CHYBA -- Level3");
+					System.out.println("ERROR -- Level3");
 				}
 			}
 			deathCount++;
+			gamePanel.updateInfo();
 		} while (!end);
 		NesnupejteDrozdi.setLevel3Level(map);
-		System.out.println("Level3 -- KONEC    " + Thread.currentThread());
+		System.out.println("Level3 -- END " + Thread.currentThread());
 	}
 	public void saveTime() {
 		cas = System.currentTimeMillis() - cas;
@@ -65,11 +61,10 @@ public class Level3 {
 		}
 		map++;
 	}
-	private void zaklad(Window window) {
+	private void base(Window window) {
 		window.smazat();
 		infoLabel = new JLabel();
 
-		infoLabel.setText("Úmrtí v důsledku závislosti:  "+ defaultPosition + "Klíče: " + keyCount+ "/5");
 		infoLabel.setBounds(RelativeSize.rectangle(0, 0, 100, 10));
 		infoLabel.setHorizontalAlignment(JLabel.CENTER);
 		infoLabel.setVerticalTextPosition(JLabel.CENTER);

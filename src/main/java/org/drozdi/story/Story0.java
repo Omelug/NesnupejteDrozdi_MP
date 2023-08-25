@@ -17,7 +17,7 @@ public class Story0 extends JPanel {
 	JButton back = new JButton();
 	JButton dal = new JButton();
 
-	// zakladni 
+	// baseni
 	final String quit = "cedulePribehy/quit.png";
 	final String sipka = "cedulePribehy/sipka.png";
 
@@ -26,10 +26,10 @@ public class Story0 extends JPanel {
 		
 		//window.smazat();
 		window.defOkno();
-		zaklad(text);
+		base(text);
 	}
 
-	void zaklad(String text) {
+	void base(String text) {
 		window.hlPanel.setLayout(null);
 		window.hlPanel.setBounds(RelativeSize.rectangle(0,0,100,75));
 		
@@ -48,7 +48,7 @@ public class Story0 extends JPanel {
 		setUpDownBar();
 		
 		nastavPribeh(text);
-		// zakladni nastaveni
+		// baseni nastaveni
 		if (textLabel.getText() == null)
 			nastavPribeh("Ticho jako po pěšině...");
 	}

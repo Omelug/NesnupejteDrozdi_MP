@@ -4,26 +4,22 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
-import java.util.Objects;
-
 import lombok.Data;
 import org.drozdi.game.Test;
-import org.drozdi.levels.level3.player.Direction;
 import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.walls.Slug;
 import org.drozdi.levels.level3.walls.Tower;
 
 @Data
 public class Bullet {
-	public static Point size = new Point(20, 20);;
+	public static Point size = new Point(20, 20);
 	public Point2D.Double position;
 	private Panel_level3 panel;
-	Point2D.Double speed;
-	static int bulletSpeed = 10;
-	BulletType bulletType; // 1 je od hrace, 2 je od towers
-	public Rectangle hitBox;
+	private Point2D.Double speed;
+	private static int bulletSpeed = 10;
+	private BulletType bulletType;
+	private Rectangle hitBox;
 
 	public Bullet(Panel_level3 panel, Player_lvl3 player) {
 		bulletType = BulletType.PLAYER;
@@ -68,19 +64,6 @@ public class Bullet {
 		position.x = position.x + speed.x;
 		position.y = position.y + speed.y;
 
-		/**for (Wall wall : panel.getWallsOnScreen()) {
-			if (wall.getHitBox().intersects(hitBox)) {
-				switch (bulletType) {
-					case 1 -> {
-						boolean test = panel.getPlayerShots().remove(this);
-						System.out.println(""+ test);
-					}
-					case 3 -> {
-						panel.getEntityShots().remove(this);
-					}
-				}
-			}
-		}**/
 		hitBox = new Rectangle((int) (position.x - panel.getShift().x), (int) (position.y), size.x, size.y);
 	}
 
@@ -104,14 +87,4 @@ public class Bullet {
 			g2d.draw(hitBox);
 		}
 	}
-	/*@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Bullet bullet = (Bullet) o;
-		return Objects.equals(position, bullet.position) &&
-				Objects.equals(panel, bullet.panel) &&
-				Objects.equals(speed, bullet.speed) &&
-				bulletType == bullet.bulletType;
-	}*/
 }

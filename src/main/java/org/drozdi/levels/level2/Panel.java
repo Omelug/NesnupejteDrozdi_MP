@@ -268,7 +268,7 @@ public class Panel extends JPanel implements Runnable {
 			if (pult.get(i).y > getHeight()) {
 				// System.out.println("zniceno");
 				pult.remove(i);
-			} else if (pult.get(i).kolize(vozik)) {
+			} else if (pult.get(i).collision(vozik)) {
 				switch (pult.get(i).name) {
 				case "drozdi": {
 					pocetDrozdi++;

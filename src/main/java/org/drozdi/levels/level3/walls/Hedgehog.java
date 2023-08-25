@@ -5,18 +5,18 @@ import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
 import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.Wall;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+
+import java.awt.*;
+
 
 public class Hedgehog extends Wall {
 	public Hedgehog(int x, int y, int sizeX, int sizeY, Panel_level3 panel) {
 		super(x, y, sizeX, sizeY, panel);
 	}
 
-	public void draw(Graphics2D g2d, Rectangle r) {
-		if (getHitBox().intersects(r)) {
-			g2d.drawImage(FileManager_lvl3.hedgehog, getHitBox().x, getHitBox().y, getSize().x, getSize().y, null);
-		}
+	@Override
+	public void draw() {
+		drawOnScreen(FileManager_lvl3.hedgehog);
 	}
 
 	public void collisionControl(Player_lvl3 player) {

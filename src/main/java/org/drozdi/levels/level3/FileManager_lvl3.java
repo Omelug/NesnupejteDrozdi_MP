@@ -7,7 +7,7 @@ import java.awt.Point;
 public class FileManager_lvl3 {
 	public static BufferedImage playerRight, playerLeft, playerUp, playerDown;
 	public static BufferedImage bullet;
-	public static BufferedImage  palet;
+	public static BufferedImage palette;
 	public static BufferedImage wall, hedgehog, ladder,tower,slug, checkpoint, key, door, doorOpen;
 	public static Point[] defaultMapPosition;
 
@@ -15,7 +15,7 @@ public class FileManager_lvl3 {
 		defaultMapPosition = new Point[]{new Point(13, 10),new Point(13, 10),new Point(13, 10)};
 
 		// map colors
-		palet = FileManager.loadResource("Level3/maps/colors.bmp");
+		palette = FileManager.loadResource("Level3/maps/colors.bmp");
 
 		//player position
 		if (playerRight == null) {playerRight = FileManager.loadResource("player/right.png");}

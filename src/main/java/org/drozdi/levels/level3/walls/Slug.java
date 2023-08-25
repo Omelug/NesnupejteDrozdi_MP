@@ -5,7 +5,6 @@ import org.drozdi.levels.level3.*;
 import org.drozdi.levels.level3.player.Player_lvl3;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Slug extends Wall {
@@ -14,12 +13,12 @@ public class Slug extends Wall {
 
 	public Slug(int x, int y, int sizeX, int sizeY, Panel_level3 panel) {
 		super(x, y, sizeX*2, sizeY, panel);
-		setHitBox(new Rectangle(getPosition().x - panel.getShift().x+panel.getCellSize(), getPosition().y, getSize().x-panel.getCellSize(), getSize().y));
+		setHitBox(new Rectangle((int) (getPosition().x - panel.getShift().x+panel.getCellSize()), getPosition().y, getSize().x-panel.getCellSize(), getSize().y));
 		this.panel = panel;
 	}
 
 	public void setUp(Player_lvl3 player) {
-	  	setHitBox(new Rectangle(getPosition().x - panel.getShift().x, getPosition().y, getSize().x, getSize().y));
+	  	setHitBox(new Rectangle((int) (getPosition().x - panel.getShift().x), getPosition().y, getSize().x, getSize().y));
 		if (getHitBox().intersects(panel.getScreen())) {
 			shoot++;
 			if (shoot > 50) {
@@ -29,13 +28,18 @@ public class Slug extends Wall {
 		}
 	}
 
-	public void draw(Graphics2D g2d, Rectangle r) {
-		if (getHitBox().intersects(r)) {
-			g2d.drawImage(FileManager_lvl3.slug,	getHitBox().x, getHitBox().y, getSize().x, getSize().y, null);
-		}
+	@Override
+	public void draw() {
+		drawOnScreen(FileManager_lvl3.slug);
 		if (Test.isHitBoxTower()) {
-			g2d.setColor(Color.green);
-			g2d.draw(getHitBox());
+			getPanel().getG2d().setColor(Color.green);
+			getPanel().getG2d().draw(getHitBox());
 		}
 	}
+
+    public void drawLine(Player_lvl3 player) {
+		getPanel().getG2d().setColor(Color.red);
+		getPanel().getG2d().drawLine((int) (player.getPosition().x + player.getSize().x / 2), (int) (player.getPosition().y + player.getSize().y / 2),
+				(int) (getPosition().x + getPanel().getCellSize() - getPanel().getShift().x), getPosition().y + getPanel().getCellSize());
+    }
 }

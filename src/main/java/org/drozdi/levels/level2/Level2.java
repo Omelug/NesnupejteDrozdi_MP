@@ -18,7 +18,7 @@ public class Level2 {
 	public Level2(Window window) {
 		this.window = window;
 		window.setTitle("Šňupejte droždí - Level 2 - NÁKUP");
-		zaklad(window);
+		base(window);
 		window.repaint();
 
 		thread = Thread.currentThread();
@@ -41,7 +41,7 @@ public class Level2 {
 		}
 	}
 
-	void zaklad(Window window) {
+	void base(Window window) {
 		window.smazat();
 		window.defOkno();
 

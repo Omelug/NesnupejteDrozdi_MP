@@ -33,7 +33,7 @@ public Level1(Window window) {
 		mistniWindow = window;
 		
 		window.smazat();
-		zaklad(window);
+		base(window);
 		window.setUpOtazku(window, window.answerPanel, window.otazkyLabel, tlacitko1, tlacitko2, otazka,
 				"Vyhodit droždí do koše", "Vyšňupat droždí");
 
@@ -133,7 +133,7 @@ public Level1(Window window) {
 
 	}
 
-	void zaklad(Window window) {
+	void base(Window window) {
 		window.defOkno();
 		filemanager = new FileManager_lvl1();
 		tlacitko1 = new JButton();

@@ -1,5 +1,6 @@
 package org.drozdi.levels.level3;
 
+import java.awt.geom.Point2D;
 import java.util.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -21,19 +22,19 @@ import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.walls.*;
 
 // https://youtu.be/Icd2gAHDSfY
-
 public class Panel_level3 extends JPanel{
 	private long lastUpdateTime = System.nanoTime();
 	private double fps = 0;
-
 	private Player_lvl3 player;
 	private Timer timer;
 	@Getter @Setter
-	private Point shift;
+	private Point2D.Double shift;
+	@Getter @Setter
+	private Point defaultPosition, screenPosition, defaultScreenPosition;
 	@Getter @Setter
 	private long cas;
 	@Getter @Setter
-	boolean end;
+	private boolean end;
 
 	@Getter @Setter
 	private Set<Wall> walls = new HashSet<>();
@@ -64,13 +65,19 @@ public class Panel_level3 extends JPanel{
 	private Rectangle screen;
 	@Getter @Setter
 	private Level3 level3;
-
 	@Getter @Setter
 	private static BufferedImage map;
+	@Getter @Setter
+	private Graphics2D g2d;
 
 	public Panel_level3(Level3 level3) {
+		this.level3 = level3;
+
+		defaultScreenPosition = new Point(13, 10);
+		screenPosition = new Point(13, 10);
+		defaultPosition = (Point) screenPosition.clone();
 		end = false;
-		setLevel3(level3);
+
 		start();
 	}
 
@@ -78,19 +85,17 @@ public class Panel_level3 extends JPanel{
 		setBackground(new Color(45, 25, 33));
 		setBounds(RelativeSize.rectangle(0, 0, 100, 85));
 		setDoubleBuffered(true);
-		// cellSize = this.getWidth() / 40;
 		cellSize = (int) (getHeight() / 18.25);
-		//cellSize = 50;
 		Bullet.size = new Point((int) (cellSize / 2.2), (int) (cellSize / 2.2));
-
-		player = new Player_lvl3(new Point(level3.getScreenPosition().x * cellSize,
-				level3.getScreenPosition().y * cellSize), this);
-		shift = new Point(level3.getShift().x, level3.getShift().y);
-
+		updateInfo();
+		player = new Player_lvl3(new Point(screenPosition.x * cellSize, screenPosition.y * cellSize), this);
+		shift = new Point2D.Double(0, 0);
 		screen = new Rectangle(0, 0, getWidth(), getHeight());
-		setUpeniZdi();
+		System.out.println("Panel {" + getWidth() +";"+ getHeight()+"}");
+		loadMap();
 		level3.setEnd(true);
 		cas = System.nanoTime();
+
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
@@ -100,8 +105,8 @@ public class Panel_level3 extends JPanel{
 					repaint();
 				} catch (Exception e) {
 					timer.cancel();
+					System.out.println("END with exeption:");
 					e.printStackTrace();
-					System.out.println("KONEC" + e);
 				}
 			}
 		}, 50, 15);
@@ -128,7 +133,9 @@ public class Panel_level3 extends JPanel{
 				wallsOnScreen.add(wall);
 			}
 		}
-		for (Hedgehog hedgehog : hedgehogs) {hedgehog.setUp();}
+		for (Hedgehog hedgehog : hedgehogs) {
+			hedgehog.setUp();
+		}
 		for (Ladder ladder : ladders) {
 			ladder.setUp();
 		}
@@ -139,13 +146,13 @@ public class Panel_level3 extends JPanel{
 			checkpoint.setUp();
 		}
 		for (Tower tower : towers) {
-			tower.setUp();
+			tower.setUp(player);
 		}
 		for (Slug slug : slugs) {
-			slug.setUp();
+			slug.setUp(player);
 		}
 		for (Door door : doors) {
-			door.setUp();
+			door.setUp(this);
 		}
 		player.setUp();
 
@@ -174,13 +181,14 @@ public class Panel_level3 extends JPanel{
 				}
 			}
 		}
-
+		//TODO move to Player
 		Iterator<Key> keyIterator = keys.iterator();
 		while (keyIterator.hasNext()) {
 			Key key = keyIterator.next();
 			if (player.getHitBox().intersects(key.getHitBox())) {
 				keyIterator.remove();
 				getLevel3().setKeyCount(getLevel3().getKeyCount()+1);
+				updateInfo();
 			}
 		}
 
@@ -215,33 +223,32 @@ public class Panel_level3 extends JPanel{
 		for (Bullet bullet : playerShots) {
 			bullet.setUp();
 		}
+
 		for (Bullet bullet : entityShots) {
 			bullet.setUp();
 		}
-
-		updateInfo();
-
 	}
 
-	private void updateInfo() {
-		level3.infoLabel.setText(
-				"Úmrtí v důsledku závislosti: " + level3.getDeathCount() + "  Klíče: " + level3.getKeyCount() + "/5");
-
+	public void updateInfo() {
+		level3.infoLabel.setText("Úmrtí v důsledku závislosti: " + level3.getDeathCount() + "  Klíče: " + level3.getKeyCount() + "/5");
 	}
 
-	private void setUpeniZdi() {
+	public void setInfo(String info) {
+		level3.infoLabel.setText(info);
+	}
 
-		int wall = FileManager_lvl3.palet.getRGB(0, 0);
-		int dead = FileManager_lvl3.palet.getRGB(1, 0);
-		int ladder = FileManager_lvl3.palet.getRGB(2, 0);
-		int tower = FileManager_lvl3.palet.getRGB(3, 0);
-		int checkpoint = FileManager_lvl3.palet.getRGB(4, 0);
-		int key = FileManager_lvl3.palet.getRGB(5, 0);
-		int door = FileManager_lvl3.palet.getRGB(6, 0);
-		int slug = FileManager_lvl3.palet.getRGB(7, 0);
+	private void loadMap() {
+
+		int wall = FileManager_lvl3.palette.getRGB(0, 0);
+		int dead = FileManager_lvl3.palette.getRGB(1, 0);
+		int ladder = FileManager_lvl3.palette.getRGB(2, 0);
+		int tower = FileManager_lvl3.palette.getRGB(3, 0);
+		int checkpoint = FileManager_lvl3.palette.getRGB(4, 0);
+		int key = FileManager_lvl3.palette.getRGB(5, 0);
+		int door = FileManager_lvl3.palette.getRGB(6, 0);
+		int slug = FileManager_lvl3.palette.getRGB(7, 0);
 
 		map = FileManager.loadResource("Level3/maps/map" + level3.getMap() + ".bmp");
-
 
 		for (int y = 0; y < map.getHeight(); y++) {
 			for (int x = 0; x < map.getWidth(); x++) {
@@ -277,57 +284,54 @@ public class Panel_level3 extends JPanel{
 
 	}
 
-	public void paint(Graphics g) {
-		super.paint(g);
+	@Override
+	public void paint(Graphics graphics) {
+		super.paint(graphics);
+		g2d = (Graphics2D) graphics;
 
-		Graphics2D g2d = (Graphics2D) g;
 		if (wallsOnScreen != null) {
 			for (Wall wall : wallsOnScreen) {
-				wall.draw(g2d, screen);
+				wall.draw();
 			}
 		}
 		if (hedgehogs != null) {
 			for (Hedgehog hedgehog : hedgehogs) {
-				hedgehog.draw(g2d, screen);
+				hedgehog.draw();
 			}
 		}
 		if (ladders != null) {
 			for (Ladder ladder : ladders) {
-				ladder.draw(g2d, screen);
+				ladder.draw();
 			}
 		}
 		if (ladders != null) {
 			for (Checkpoint checkpoint : checkpoints) {
-				checkpoint.draw(g2d, screen);
+				checkpoint.draw();
 			}
 		}
 		if (keys != null) {
 			for (Key key : keys) {
-				key.draw(g2d, screen);
+				key.draw();
 			}
 		}
 		if (doors != null) {
 			for (Door door : doors) {
-				door.draw(g2d, screen);
+				door.draw();
 			}
 		}
 		if (towers != null) {
 			for (Tower tower : towers) {
-				tower.draw(g2d, screen);
-				if (Test.isLinesTowers()) {
-					g2d.setColor(Color.red);
-					g2d.drawLine((int) (player.getPosition().x + player.getSize().x / 2), (int) (player.getPosition().y + player.getSize().y / 2),
-							tower.getPosition().x + cellSize - shift.x, tower.getPosition().y + cellSize);
+				tower.draw();
+				if (Test.isLinesTower()) {
+					tower.drawLine(player);
 				}
 			}
 		}
 		if (towers != null) {
 			for (Slug slug : slugs) {
-				slug.draw(g2d, screen);
-				if (Test.isLinesTowers()) {
-					g2d.setColor(Color.red);
-					g2d.drawLine((int) (player.getPosition().x + player.getSize().x / 2), (int) (player.getPosition().y + player.getSize().y / 2),
-							slug.getPosition().x + cellSize - shift.x, slug.getPosition().y + cellSize);
+				slug.draw();
+				if (Test.isLinesSlug()){
+					slug.drawLine(player);
 				}
 			}
 		}
@@ -359,16 +363,17 @@ public class Panel_level3 extends JPanel{
 
 	public void end() {
 		hedgehogs = null;
+		updateInfo();
 		synchronized (Level3.getThread()) {
 			try {
 				if (!end) {
 					end = true;
-					System.out.println("KONEC");
+					System.out.println("END");
 					timer.cancel();
 					Level3.getThread().notify();
 				}
 			} catch (Exception e) {
-				System.out.println("CHYBA  -- KONEC " + Thread.currentThread());
+				System.out.println("ERROR  -- END " + Thread.currentThread());
 			}
 
 		}
@@ -392,4 +397,14 @@ public class Panel_level3 extends JPanel{
 		}
 	}
 
+	public void setShift(Point p) {
+		Point2D.Double point = new Point2D.Double();
+		point.x = p.x;
+		point.y = p.y;
+		setShift(point);
+	}
+
+	public void setShift(Point2D.Double shift) {
+		this.shift = shift;
+	}
 }

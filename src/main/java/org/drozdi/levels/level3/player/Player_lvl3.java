@@ -25,7 +25,8 @@ public class Player_lvl3 {
 	private Point2D.Double speedMax = new Point2D.Double(4, 6);
 	@Getter @Setter
 	private Rectangle hitBox;
-
+	@Getter @Setter
+	private Checkpoint checkpoint;
 	@Getter @Setter
 	private boolean left, right, up, down;
 	@Getter @Setter
@@ -42,8 +43,7 @@ public class Player_lvl3 {
 		size = new Point2D.Double((0.9 * panel.getCellSize()), (0.9 * panel.getCellSize()));
 		speed = new Point2D.Double(0, 0);
 		if (screenPosition == null) {
-			position = new Point((int) (panel.getX() + panel.getWidth() / 2 - size.x / 2),
-					(int) (panel.getY() + panel.getHeight() / 2 - size.y / 2));
+			position = new Point((int) (panel.getX() + panel.getWidth() / 2 - size.x / 2), (int) (panel.getY() + panel.getHeight() / 2 - size.y / 2));
 		} else {
 			position = screenPosition;
 		}
@@ -51,22 +51,23 @@ public class Player_lvl3 {
 	}
 
 	public void setUp() {
-		double srovanani = (double) panel.getCellSize() /30;
+		double comparison = (double) panel.getCellSize() /30;
 		if (onGround) {
-			speedMax = new Point2D.Double(6*srovanani, 6*srovanani);
+			speedMax = new Point2D.Double(6*comparison, 6*comparison);
 		} else {
-			speedMax = new Point2D.Double(4*srovanani, 6*srovanani);
+			speedMax = new Point2D.Double(4*comparison, 6*comparison);
 		}
-		// setUpeni pohybu X
+
 		if (left && right || !left && !right)
 			speed.x *= 0.8;
 		else if (left)
-			speed.x = speed.x -1*srovanani;
-		else speed.x = speed.x + 1*srovanani;
-		;
-		///speed.x = speed.x*srovanani;
-		//limitovani ryvhlosti X
-		if (speed.x < 0.1*srovanani && speed.x > -0.1*srovanani) {
+			speed.x = speed.x - comparison;
+		else speed.x = speed.x + comparison;
+
+		///speed.x = speed.x*comparison;
+
+		//speed limit X
+		if (speed.x < 0.1*comparison && speed.x > -0.1*comparison) {
 			speed.x = 0;
 		}
 		if (speed.x > speedMax.x) {
@@ -79,9 +80,8 @@ public class Player_lvl3 {
 			speed.y = -1.5*speedMax.y;
 			onGround = false;
 		}
-		speed.y += 0.3*srovanani;
+		speed.y += 0.3*comparison;
 
-		// x collision
 		hitBox.x += speed.x;
 		for (Wall wall : panel.getWallsOnScreen()) {
 			if (hitBox.intersects(wall.getHitBox())) {
@@ -94,7 +94,6 @@ public class Player_lvl3 {
 			}
 		}
 
-		// ladders
 		onGround = false;
 		for (Ladder ladder : panel.getLadders()) {
 			if (hitBox.intersects(ladder.getHitBox())) {
@@ -110,7 +109,6 @@ public class Player_lvl3 {
 			}
 		}
 
-		// y collision
 		hitBox.y += speed.y;
 		for (Wall wall : panel.getWallsOnScreen()) {
 			if (hitBox.intersects(wall.getHitBox())) {
@@ -128,11 +126,11 @@ public class Player_lvl3 {
 		if (speed.x > 0) {
 			direction = Direction.RIGHT;
 		}
+
 		if (speed.x < 0) {
 			direction = Direction.LEFT;
 		}
-		
-		
+
 		position.y += speed.y;
 
 		hitBox.x = position.x;
@@ -145,21 +143,17 @@ public class Player_lvl3 {
 		}
 		shot();
 
-		// zjistuje zda byl zasazena
 		for (Bullet bullet : panel.getEntityShots()) {
 			if (hitBox.intersects(bullet.getHitBox())) {
 				panel.restart();
 			}
 		}
-		// zjistuje zda dopad na hedgehog
 		for (Hedgehog hedgehog : panel.getHedgehogs()) {
 			hedgehog.collisionControl(this);
 		}
-		// zjistuje zda je na checkpointu
 		for (Checkpoint checkpoint : panel.getCheckpoints()) {
 			checkpoint.collisionControl(this);
 		}
-		//zda šel na door
 		for (Door door : panel.getDoors()) {
 			door.collisionControl(this);
 		}
@@ -172,6 +166,7 @@ public class Player_lvl3 {
 		g2d.drawString(NesnupejteDrozdi.account, x, position.y -10);
 		g2d.drawString((position.x + panel.getShift().x) + ";" + (position.y + panel.getShift().y) + "(" + panel.getPlayerShots().size()
 			+ ")" + "(" + panel.getEntityShots().size() + ")\n+ " + "(" + onGround + ")", position.x, position.y);
+
 		switch (direction){
 			case UP -> drawPlayer(g2d,FileManager_lvl3.playerUp);
 			case RIGHT -> drawPlayer(g2d,FileManager_lvl3.playerRight);
@@ -197,5 +192,4 @@ public class Player_lvl3 {
 			panel.getPlayerShots().add(new Bullet(panel, this));
 		}
 	}
-
 }

@@ -4,10 +4,7 @@ import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
 import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.Wall;
-
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 
 public class Door extends Wall {
 	public int maxKeys;
@@ -33,23 +30,23 @@ public class Door extends Wall {
 				getPanel().getLevel3().setDeathCount(-1);
 				getPanel().getLevel3().setKeyCount(0);
 				getPanel().getLevel3().setEnd(false);
-				Point p = (Point) new Point(getPanel().getLevel3().getShift()).clone();
+				Point p = new Point((Point) getPanel().getShift().clone());
 				p.x = 0;
-				getPanel().getLevel3().setShift(p);
-				getPanel().getLevel3().setDefaultScreenPosition ((Point) getPanel().getLevel3().getDefaultScreenPosition().clone());
+				getPanel().setShift(p);
+				getPanel().setDefaultScreenPosition ((Point) getPanel().getDefaultScreenPosition().clone());
 				getPanel().end();
 			}
 		}
 
 	}
 
-	public void draw(Graphics2D g2d, Rectangle r) {
-		if (getHitBox().intersects(r)) {
+	public void draw() {
+		if (getPanel().getScreen().intersects(getHitBox())) {
 			if (open > 0) {
-				g2d.drawImage(FileManager_lvl3.door, getHitBox().x, getHitBox().y, getHitBox().x, getHitBox().y, null);
+				getPanel().getG2d().drawImage(FileManager_lvl3.door, getHitBox().x, getHitBox().y, getHitBox().x, getHitBox().y, null);
 			}else {
-				g2d.drawImage(FileManager_lvl3.doorOpen, getHitBox().x, getHitBox().y, getHitBox().x, getHitBox().y, null);
-				}
+				getPanel().getG2d().drawImage(FileManager_lvl3.doorOpen, getHitBox().x, getHitBox().y, getHitBox().x, getHitBox().y, null);
+			}
 		}
 	}
 }

@@ -41,7 +41,7 @@ public class Level0 {
 		background.setBounds(0,0, RelativeSize.getMaxWindowSize().x, RelativeSize.getMaxWindowSize().y);
 		window.add(background);
 
-		zaklad(window, background);
+		base(window, background);
 
 		window.pack();
 		window.setLocationRelativeTo(null);
@@ -59,7 +59,7 @@ public class Level0 {
 		System.out.println("KONEC Level0");
 	}
 
-	void zaklad(Window window, JLabel background) {
+	void base(Window window, JLabel background) {
 
 		window.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
@@ -92,10 +92,10 @@ public class Level0 {
 				g.setFont(g.getFont().deriveFont(12f));
 				g.drawString("Časy:", 20, 100);
 
-				g2d.drawString("Level1:           " + prevodCasu(NesnupejteDrozdi.casLevel1), 20, 120);
-				g2d.drawString("Level2:           " + prevodCasu(NesnupejteDrozdi.casLevel2), 20, 140);
+				g2d.drawString("Level1:           " + timeTransform(NesnupejteDrozdi.casLevel1), 20, 120);
+				g2d.drawString("Level2:           " + timeTransform(NesnupejteDrozdi.casLevel2), 20, 140);
 				for (int i = 0; i < NesnupejteDrozdi.mapTimeList.length; i++) {
-					g2d.drawString("Level3/map" + i + ":       " + prevodCasu(NesnupejteDrozdi.mapTimeList[i]), 20, 160 + 20 * i);
+					g2d.drawString("Level3/map" + i + ":       " + timeTransform(NesnupejteDrozdi.mapTimeList[i]), 20, 160 + 20 * i);
 
 				}
 			}
@@ -219,7 +219,7 @@ public class Level0 {
 			try {
 				jsonString = new String(Files.readAllBytes(Paths.get(Window.ziskatCestu(NesnupejteDrozdi.accountPath))));
 			} catch (IOException e) {
-				// e.printStackTrace();
+				e.printStackTrace();
 		}
 		try {
 			jo = new Gson().fromJson(jsonString, JsonObject.class);
@@ -245,7 +245,6 @@ public class Level0 {
 	}
 
 	private JButton levelBtn3Mapa(Rectangle rect, int map) {
-		// tlacitko Levely
 		JButton button = new JButton() {
 			@Override
 			public void paintComponent(Graphics g) {
@@ -264,7 +263,6 @@ public class Level0 {
 		window.hlPanel.setOpaque(false);
 		button.setBounds(rect);
 		button.setVisible(true);
-		// tlacitko.repaint();
 		return button;
 	}
 
@@ -276,7 +274,6 @@ public class Level0 {
 	}
 
 	private JButton levelBtn( Rectangle rect, int levelNumber) {
-		// tlacitko Levely
 		JButton button = new JButton() {
 			@Override
 			public void paintComponent(Graphics g) {
@@ -293,11 +290,10 @@ public class Level0 {
 		window.hlPanel.setOpaque(false);
 		button.setBounds(rect);
 		button.setVisible(true);
-		// tlacitko.repaint();
 		return button;
 	}
 
-	private String prevodCasu(long cas) {
+	private String timeTransform(long cas) {
 		if (cas == 2147483647) {
 			return "??????";
 		}
