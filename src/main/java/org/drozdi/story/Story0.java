@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 import java.awt.Rectangle;
 
 @SuppressWarnings("serial")
-public class Pribeh extends JPanel {
+public class Story0 extends JPanel {
 	JLabel textLabel = new JLabel();
 	Window window;
 	JButton zpet = new JButton();
@@ -23,7 +23,7 @@ public class Pribeh extends JPanel {
 	final String quit = "cedulePribehy/quit.png";
 	final String sipka = "cedulePribehy/sipka.png";
 
-	public Pribeh(Window window, String text) {
+	public Story0(Window window, String text) {
 		this.window = window;
 		
 		//window.smazat();

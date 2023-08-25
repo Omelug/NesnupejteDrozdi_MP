@@ -19,7 +19,6 @@ public class Checkpoint extends Wall {
 
 	public void kontrolaKolize(Player_lvl3 player) {
 		if (player.getHitBox().intersects(getHitBox())) {
-			//panel.getLevel3().shift.x =   panel.getLevel3().shift.x + (getHitBox().x - player.getHitBox().x)
 			getPanel().getLevel3().getShift().x = getPanel().getShift().x+ (getHitBox().x - player.getHitBox().x);
 			getPanel().getLevel3().getDefaultPosition().x = getPosition().x / getPanel().getCellSize();
 			getPanel().getLevel3().getScreenPosition().y = getPosition().y / getPanel().getCellSize();

@@ -2,9 +2,9 @@ package org.drozdi.story;
 
 import org.drozdi.game.Window;
 
-public class Pribeh3 {
+public class Story3 {
 
-	public Pribeh3(Window window) {
+	public Story3(Window window) {
 		
 		String text = "<html>" + "<body style=\"  border: 0px solid red; size:25\">"
 				+ "  <div style='text-align: center;'>"
@@ -14,9 +14,9 @@ public class Pribeh3 {
 				+ "<br/><br/><br/> Ovládání: pohyb - WASD a restart - R, konec - T, strileni - SPACE " + "  </div> </body> </html>";
 
 		
-		Pribeh pribeh = new Pribeh(window, text);
+		Story0 story0 = new Story0(window, text);
 		
-		pribeh.cekatNaVstup();
+		story0.cekatNaVstup();
 		System.out.println("KONEC --Pribeh2    " + Thread.currentThread());
 	}
 

@@ -218,13 +218,13 @@ public class Panel extends JPanel implements Runnable {
 					startTlacitko.removeChangeListener(this);
 					System.out.println("KONEC tlacitko  " + Thread.currentThread());
 					level2.ulozeniCasu();
-					konec();
+					end();
 				}
 			}
 
 		});
 	}
-	public void konec() {
+	public void end() {
 		synchronized (Level2.t) {
 			try {
 				mistniWindow.smazat();

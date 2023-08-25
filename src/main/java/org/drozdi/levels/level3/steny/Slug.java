@@ -25,13 +25,6 @@ public class Slug extends Wall {
 				shoot = 0;
 				panel.getEntityShots().add(new Bullet(panel, this, player));
 			}
-			//zjistuje zda byla zasazena
-			for (Bullet bullet : panel.getPlayerShots()) {
-				if (getHitBox().intersects(bullet.getHitBox())) {
-					panel.getPlayerShots().remove(bullet);
-					panel.getSlugs().remove(this);
-				}
-			}
 		}
 	}
 
@@ -39,7 +32,7 @@ public class Slug extends Wall {
 		if (getHitBox().intersects(r)) {
 			g2d.drawImage(FileManager_lvl3.slug,	getHitBox().x, getHitBox().y, getSize().x, getSize().y, null);
 		}
-		if (Test.hitBoxTower) {
+		if (Test.isHitBoxTower()) {
 			g2d.setColor(Color.green);
 			g2d.draw(getHitBox());
 		}

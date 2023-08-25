@@ -23,7 +23,7 @@ import org.drozdi.levels.level3.steny.*;
 
 // https://youtu.be/Icd2gAHDSfY
 
-public class Panel_level3 extends JPanel implements ActionListener {
+public class Panel_level3 extends JPanel{
 	private int frameCount = 0;
 	private long lastUpdateTime = System.nanoTime();
 	private double fps = 0;
@@ -67,6 +67,7 @@ public class Panel_level3 extends JPanel implements ActionListener {
 	@Getter @Setter
 	private Level3 level3;
 
+	private static boolean running;
 	@Getter @Setter
 	private static BufferedImage map;
 
@@ -93,13 +94,13 @@ public class Panel_level3 extends JPanel implements ActionListener {
 		level3.setEnd(true);
 		cas = System.nanoTime();
 		timer = new Timer();
+		running = true;
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
 					update();
 					repaint();
-
 				} catch (Exception e) {
 					timer.cancel();
 					e.printStackTrace();
@@ -151,6 +152,15 @@ public class Panel_level3 extends JPanel implements ActionListener {
 		}
 		player.nastav();
 
+		Iterator<Bullet>  entityBulletIretator = entityShots.iterator();
+		while (entityBulletIretator.hasNext()) {
+			Bullet bullet = entityBulletIretator.next();
+			if (!screen.intersects(bullet.getHitBox())){
+				entityBulletIretator.remove();
+				break;
+			}
+		}
+
 		Iterator<Bullet> playerShotsIterator = playerShots.iterator();
 		while (playerShotsIterator.hasNext()) {
 			Bullet bullet = playerShotsIterator.next();
@@ -160,30 +170,56 @@ public class Panel_level3 extends JPanel implements ActionListener {
 			}
 			for (Wall wall : getWallsOnScreen()) {
 				if (wall.getHitBox().intersects(bullet.getHitBox())) {
-					switch (bullet.getTypStrely()) {
-						case 1:
-							playerShotsIterator.remove();
-							break;
-						/*case 3:
-							playerShotsIterator.remove();
-							break;*/
+					if (bullet.getTypStrely() == 1) {
+						playerShotsIterator.remove();
+						break;
 					}
 				}
 			}
 		}
 
+		Iterator<Key> keyIterator = keys.iterator();
+		while (keyIterator.hasNext()) {
+			Key key = keyIterator.next();
+			if (player.getHitBox().intersects(key.getHitBox())) {
+				keyIterator.remove();
+				getLevel3().setKeyCount(getLevel3().getKeyCount()+1);
+			}
+		}
+
+		Iterator<Tower> towerIterator = towers.iterator();
+		while (towerIterator.hasNext()) {
+			Tower tower = towerIterator.next();
+			Iterator<Bullet> bulletIterator = getPlayerShots().iterator();
+			while (bulletIterator.hasNext()) {
+				Bullet bullet = bulletIterator.next();
+				if (bullet.getHitBox().intersects(tower.getHitBox())) {
+					bulletIterator.remove();
+					towerIterator.remove();
+					break;
+				}
+			}
+		}
+
+		Iterator<Slug> slugrIterator = slugs.iterator();
+		while (slugrIterator.hasNext()) {
+			Slug slug = slugrIterator.next();
+			Iterator<Bullet> bulletIterator = getPlayerShots().iterator();
+			while (bulletIterator.hasNext()) {
+				Bullet bullet = bulletIterator.next();
+				if (bullet.getHitBox().intersects(slug.getHitBox())) {
+					bulletIterator.remove();
+					slugrIterator.remove();
+					break;
+				}
+			}
+		}
 
 		for (Bullet bullet : playerShots) {
 			bullet.nastav();
-			/*if (!screen.intersects(bullet.getHitBox())) {
-				playerShots.remove(bullet);
-			}*/
 		}
 		for (Bullet bullet : entityShots) {
 			bullet.nastav();
-			if (!screen.intersects(bullet.getHitBox())) {
-				entityShots.remove(bullet);
-			}
 		}
 
 		updateInfo();
@@ -321,18 +357,19 @@ public class Panel_level3 extends JPanel implements ActionListener {
 			case 's' ->	player.setDown(false);
 			case 'd' -> player.setRight(false);
 			case 'r' -> restart();
-			case 't' -> konec();
+			case 't' -> end();
 			case KeyEvent.VK_SPACE -> player.setShooting(false);
 		}
 	}
 
-	public void konec() {
+	public void end() {
 		hedgehogs = null;
 		synchronized (Level3.getThread()) {
 			try {
 				if (!end) {
 					end = true;
 					System.out.println("KONEC");
+					timer.cancel();
 					Level3.getThread().notify();
 				}
 			} catch (Exception e) {
@@ -347,7 +384,7 @@ public class Panel_level3 extends JPanel implements ActionListener {
 		level3.setSavedKeyList(new ArrayList<>());
 		level3.getSavedKeyList().addAll(keys);
 		level3.setEnd(false);
-		konec();
+		end();
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -358,12 +395,6 @@ public class Panel_level3 extends JPanel implements ActionListener {
 			case 'd' -> player.setRight(true);
 			case KeyEvent.VK_SPACE -> player.setShooting(true);
 		}
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 }

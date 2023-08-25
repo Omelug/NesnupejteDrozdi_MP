@@ -44,7 +44,7 @@ public class Pohyb implements KeyListener {
 			vozik.otocenDoPrava = true;
 			break;
 		case 't':
-			panel.konec();
+			panel.end();
 			break;
 		}
 	}

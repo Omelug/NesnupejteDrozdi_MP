@@ -41,12 +41,11 @@ public class Level3 {
 		screenPosition = new Point(13, 10);
 		defaultPosition = (Point) screenPosition.clone();
 		shift = new Point(0, 0);
-		//window.repaint();
+		window.repaint();
 		cas = System.currentTimeMillis();
 		do {
 			panelBase(window);
 			thread = Thread.currentThread();
-			
 			synchronized (thread) {
 				try {
 					thread.wait();

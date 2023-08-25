@@ -159,10 +159,6 @@ public class Player_lvl3 {
 		for (Checkpoint checkpoint : panel.getCheckpoints()) {
 			checkpoint.kontrolaKolize(this);
 		}
-		//zjistuje zda sebral key
-		for (Key key : panel.getKeys()) {
-			key.kontrolaKolize(this);
-		}
 		//zda šel na door
 		for (Door door : panel.getDoors()) {
 			door.kontrolaKolize(this);

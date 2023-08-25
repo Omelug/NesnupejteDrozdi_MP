@@ -22,19 +22,11 @@ public class Tower extends Wall {
 		if (getHitBox().intersects(panel.getScreen())) {
 			shot++;
 			if (shot > 80) {
-				//System.out.println("adwawd");
 				shot = 0;
 				panel.getEntityShots().add(new Bullet(panel, this, player));
 			}
-			//zjistuje zda byla zasazena
-			for (Bullet bullet : panel.getPlayerShots()) {
-				if (getHitBox().intersects(bullet.getHitBox())) {
-					panel.getPlayerShots().remove(bullet);
-					panel.getTowers().remove(this);
-				}
-			}
 		}
-		}
+	}
 
 	public void draw(Graphics2D g2d, Rectangle r) {
 		if (getHitBox().intersects(r)) {
@@ -44,7 +36,7 @@ public class Tower extends Wall {
 			//g2d.setColor(Color.red);
 			//g2d.fillRect(getPosition().x - panel.shift.x, getPosition().y, size.x, size.y);
 		}
-		if (Test.hitBoxTower) {
+		if (Test.isHitBoxTower()) {
 			g2d.setColor(Color.green);
 			g2d.draw(getHitBox());
 		}

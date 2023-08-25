@@ -37,7 +37,7 @@ public class Door extends Wall {
 				p.x = 0;
 				getPanel().getLevel3().setShift(p);
 				getPanel().getLevel3().setDefaultScreenPosition ((Point) getPanel().getLevel3().getDefaultScreenPosition().clone());
-				getPanel().konec();
+				getPanel().end();
 			}
 		}
 

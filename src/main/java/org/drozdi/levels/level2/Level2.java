@@ -20,9 +20,8 @@ public class Level2 {
 		window.setTitle("Šňupejte droždí - Level 2 - NÁKUP");
 		zaklad(window);
 		window.repaint();
-		// cekani na ukonceni
+
 		t = Thread.currentThread();
-		
 		synchronized (t) {
 			try {
 				t.wait();

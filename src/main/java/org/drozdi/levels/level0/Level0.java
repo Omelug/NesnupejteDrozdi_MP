@@ -260,7 +260,7 @@ public class Level0 {
 		tlacitko.addActionListener(e -> {
 			NesnupejteDrozdi.progress = 3;
 			NesnupejteDrozdi.setLevel3Level(map);
-			konec();
+			end();
 		});
 		window.hlPanel.setOpaque(false);
 		tlacitko.setBounds(rect);
@@ -269,7 +269,7 @@ public class Level0 {
 		return tlacitko;
 	}
 
-	public void konec() {
+	public void end() {
 		synchronized (this) {
 			notify();
 		}
@@ -289,7 +289,7 @@ public class Level0 {
 		};
 		tlacitko.addActionListener(e -> {
 			NesnupejteDrozdi.progress = cisloLevelu;
-			konec();
+			end();
 		});
 		window.hlPanel.setOpaque(false);
 		tlacitko.setBounds(rect);

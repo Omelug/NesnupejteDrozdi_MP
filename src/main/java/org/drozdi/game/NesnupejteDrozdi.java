@@ -6,17 +6,17 @@ import org.drozdi.levels.level0.Level0;
 import org.drozdi.levels.level1.Level1;
 import org.drozdi.levels.level2.Level2;
 import org.drozdi.levels.level3.Level3;
-import org.drozdi.story.Pribeh1;
-import org.drozdi.story.Pribeh2;
-import org.drozdi.story.Pribeh3;
+import org.drozdi.story.Story1;
+import org.drozdi.story.Story2;
+import org.drozdi.story.Story3;
 
 
 public class NesnupejteDrozdi {
 	final static int MAX_TIME = 2147483647;
 
-	public static int progress = 3; //TODO:
+	public static int progress = 0; //TODO:
 	@Setter @Getter
-	private static int level3Level = 2; //TODO
+	private static int level3Level = 0; //TODO
 	public static boolean jitdal;
 	public static long casLevel1= MAX_TIME, casLevel2= MAX_TIME;
 	public static long[] mapTimeList= {MAX_TIME, MAX_TIME, MAX_TIME, MAX_TIME, MAX_TIME, MAX_TIME};
@@ -31,7 +31,7 @@ public class NesnupejteDrozdi {
 					new Level0(window);
 				}
 				case 1 -> {
-					new Pribeh1(window);
+					new Story1(window);
 					if (jitdal) {
 						new Level1(window);
 						progress++;
@@ -40,7 +40,7 @@ public class NesnupejteDrozdi {
 					}
 				}
 				case 2 -> {
-					new Pribeh2(window);
+					new Story2(window);
 					if (jitdal) {
 						new Level2(window);
 						progress++;
@@ -49,7 +49,7 @@ public class NesnupejteDrozdi {
 					}
 				}
 				case 3 -> {
-					new Pribeh3(window);
+					new Story3(window);
 					if (jitdal) {
 						new Level3(window);
 					}
