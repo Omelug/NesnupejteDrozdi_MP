@@ -60,7 +60,7 @@ public class Window extends JFrame {
 		return scaledIcon;
 	}
 
-	public void nastavOtazku(Window window, JPanel panel, JLabel label, JButton tlacitko1, JButton tlacitko2, String otazka, String odpoved1, String odpoved2) {
+	public void setUpOtazku(Window window, JPanel panel, JLabel label, JButton tlacitko1, JButton tlacitko2, String otazka, String odpoved1, String odpoved2) {
 
 		label.setText(otazka);
 

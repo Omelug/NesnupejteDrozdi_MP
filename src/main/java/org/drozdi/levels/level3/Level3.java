@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
-import org.drozdi.levels.level3.steny.Key;
+import org.drozdi.levels.level3.walls.Key;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -28,7 +28,7 @@ public class Level3 {
 	private int deathCount = 0;
 	private int keyCount = 0;
 	int map;
-	long cas;
+	private long cas;
 	private JFrame window;
 	public Level3(Window window) {
 		this.window = window;
@@ -58,7 +58,7 @@ public class Level3 {
 		NesnupejteDrozdi.setLevel3Level(map);
 		System.out.println("Level3 -- KONEC    " + Thread.currentThread());
 	}
-	public void ulozeniCasu() {
+	public void saveTime() {
 		cas = System.currentTimeMillis() - cas;
 		if (NesnupejteDrozdi.mapTimeList[map] > cas) {
 			NesnupejteDrozdi.mapTimeList[map]= cas;
@@ -70,7 +70,7 @@ public class Level3 {
 		infoLabel = new JLabel();
 
 		infoLabel.setText("Úmrtí v důsledku závislosti:  "+ defaultPosition + "Klíče: " + keyCount+ "/5");
-		infoLabel.setBounds(RelativeSize.rectangle(0, 0, 100, 15));
+		infoLabel.setBounds(RelativeSize.rectangle(0, 0, 100, 10));
 		infoLabel.setHorizontalAlignment(JLabel.CENTER);
 		infoLabel.setVerticalTextPosition(JLabel.CENTER);
 		infoLabel.setFont(new Font("Consolas", Font.PLAIN, 35));

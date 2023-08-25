@@ -13,7 +13,7 @@ public class Level2 {
 	Window window;
 	Vozik vozik;
 	public static Panel hraPanel;
-	static Thread t;
+	static Thread thread;
 	private long cas;
 	public Level2(Window window) {
 		this.window = window;
@@ -21,10 +21,10 @@ public class Level2 {
 		zaklad(window);
 		window.repaint();
 
-		t = Thread.currentThread();
-		synchronized (t) {
+		thread = Thread.currentThread();
+		synchronized (thread) {
 			try {
-				t.wait();
+				thread.wait();
 			} catch (InterruptedException ex) {
 				System.out.println("CHYBA -- Level2" + ex);
 			}
@@ -34,7 +34,7 @@ public class Level2 {
 	public void setCas(long cas){
 		cas = cas;
 	}
-	public void ulozeniCasu() {
+	public void saveTime() {
 		cas = System.currentTimeMillis() - cas;
 		if (NesnupejteDrozdi.casLevel2 > cas) {
 			NesnupejteDrozdi.casLevel2 = cas;

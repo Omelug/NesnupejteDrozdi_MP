@@ -14,10 +14,11 @@ import org.drozdi.story.Story3;
 public class NesnupejteDrozdi {
 	final static int MAX_TIME = 2147483647;
 
-	public static int progress = 0; //TODO:
+	public static int progress = 0;
+
 	@Setter @Getter
-	private static int level3Level = 0; //TODO
-	public static boolean jitdal;
+	private static int level3Level = 0;
+	public static boolean progressContinue;
 	public static long casLevel1= MAX_TIME, casLevel2= MAX_TIME;
 	public static long[] mapTimeList= {MAX_TIME, MAX_TIME, MAX_TIME, MAX_TIME, MAX_TIME, MAX_TIME};
 	public static String account = "NesnupejteDrozdi";
@@ -27,12 +28,10 @@ public class NesnupejteDrozdi {
 		Window window = new Window();
 		do {
 			switch (progress) {
-				case 0 -> {
-					new Level0(window);
-				}
+				case 0 -> new Level0(window);
 				case 1 -> {
 					new Story1(window);
-					if (jitdal) {
+					if (progressContinue) {
 						new Level1(window);
 						progress++;
 					} else {
@@ -41,7 +40,7 @@ public class NesnupejteDrozdi {
 				}
 				case 2 -> {
 					new Story2(window);
-					if (jitdal) {
+					if (progressContinue) {
 						new Level2(window);
 						progress++;
 					} else {
@@ -50,7 +49,7 @@ public class NesnupejteDrozdi {
 				}
 				case 3 -> {
 					new Story3(window);
-					if (jitdal) {
+					if (progressContinue) {
 						new Level3(window);
 					}
 					progress = 0;

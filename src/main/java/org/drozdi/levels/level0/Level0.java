@@ -23,14 +23,13 @@ import static java.lang.Thread.currentThread;
 
 public class Level0 {
 	private Window window;
-	Thread t;
-	FileManager_lvl0 fileManagerLvl0 = new FileManager_lvl0();
+	private Thread thread;
+	private FileManager_lvl0 fileManagerLvl0 = new FileManager_lvl0();
 	private JLabel background;
-
 
 	public Level0(Window window) {
 		this.window = window;
-		t = currentThread();
+		thread = currentThread();
 		fileManagerLvl0.load();
 		window.smazat();
 		window.defOkno();
@@ -64,23 +63,23 @@ public class Level0 {
 
 		window.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
-            	ulozitCasy();
+            	saveTime();
                 System.exit(0);
             }
         });
 
 		//levely tlacitka
-		background.add(tlacitkoLevel(RelativeSize.rectangle(10, 35, 20, 10), 1));
-		background.add(tlacitkoLevel(RelativeSize.rectangle(10, 50, 20, 10), 2));
-		background.add(tlacitkoLevel(RelativeSize.rectangle(10, 65, 20, 10), 3));
+		background.add(levelBtn(RelativeSize.rectangle(10, 35, 20, 10), 1));
+		background.add(levelBtn(RelativeSize.rectangle(10, 50, 20, 10), 2));
+		background.add(levelBtn(RelativeSize.rectangle(10, 65, 20, 10), 3));
 
 		// level3 mapy
-		background.add(tlacitkoLevel3Mapa(RelativeSize.rectangle(15, 80, 7, 10), 0));
-		background.add(tlacitkoLevel3Mapa(RelativeSize.rectangle(25, 80, 7, 10), 1));
-		background.add(tlacitkoLevel3Mapa(RelativeSize.rectangle(35, 80, 7, 10), 2));
-		background.add(tlacitkoLevel3Mapa(RelativeSize.rectangle(45, 80, 7, 10), 3));
-		background.add(tlacitkoLevel3Mapa(RelativeSize.rectangle(55, 80, 7, 10), 4));
-		background.add(tlacitkoLevel3Mapa(RelativeSize.rectangle(65, 80, 7, 10), 5));
+		background.add(levelBtn3Mapa(RelativeSize.rectangle(15, 80, 7, 10), 0));
+		background.add(levelBtn3Mapa(RelativeSize.rectangle(25, 80, 7, 10), 1));
+		background.add(levelBtn3Mapa(RelativeSize.rectangle(35, 80, 7, 10), 2));
+		background.add(levelBtn3Mapa(RelativeSize.rectangle(45, 80, 7, 10), 3));
+		background.add(levelBtn3Mapa(RelativeSize.rectangle(55, 80, 7, 10), 4));
+		background.add(levelBtn3Mapa(RelativeSize.rectangle(65, 80, 7, 10), 5));
 
 		JLabel statistika = new JLabel() {
 			public void paintComponent(Graphics g) {
@@ -103,53 +102,53 @@ public class Level0 {
 		};
 		statistika.setBounds(RelativeSize.rectangle(35, 35, 20, 40));
 
-		JTextField novyUcet = new JTextField();
-		novyUcet.setBounds(RelativeSize.percentageX(10, statistika.getWidth()), 50,
+		JTextField newAccount = new JTextField();
+		newAccount.setBounds(RelativeSize.percentageX(10, statistika.getWidth()), 50,
 				RelativeSize.percentageX(60, statistika.getWidth()), 20);
-		statistika.add(novyUcet);
-		novyUcet.addActionListener(e -> {
-			ulozitCasy();
-			NesnupejteDrozdi.account = novyUcet.getText();
+		statistika.add(newAccount);
+		newAccount.addActionListener(e -> {
+			saveTime();
+			NesnupejteDrozdi.account = newAccount.getText();
 			NesnupejteDrozdi.accountPath = "login/" + NesnupejteDrozdi.account + ".json";
 			File fileCheck = new File(Window.ziskatCestu(NesnupejteDrozdi.accountPath));
 			if (fileCheck.exists() && !fileCheck.isDirectory()) {
-				nacistCasy(statistika);
+				updateTimes(statistika);
 			}else {
-				if (jeplatne(novyUcet.getText()) && !novyUcet.getText().isEmpty()) {
-					zalozitUcet();
-					nacistCasy(statistika);
+				if (isValid(newAccount.getText()) && !newAccount.getText().isEmpty()) {
+					createAccount();
+					updateTimes(statistika);
 				}else {
 					NesnupejteDrozdi.account = "NeplatnyZnaky";
 					NesnupejteDrozdi.accountPath = "login/" + NesnupejteDrozdi.account + ".json";
-					nacistCasy(statistika);
+					updateTimes(statistika);
 				}
 			}
 			NesnupejteDrozdi.accountPath = "login/" + NesnupejteDrozdi.account + ".json";
-			novyUcet.setText("");
+			newAccount.setText("");
 			statistika.repaint();
-			nacistCasy(statistika);
+			updateTimes(statistika);
 
 		});
 		background.add(statistika);
 
-		JButton discordTlacitko = new JButton() {
+		JButton discordBtn = new JButton() {
 			@Override
-			public void paintComponent(Graphics g) {
-				Graphics2D g2d = (Graphics2D) g;
+			public void paintComponent(Graphics graphics) {
+				Graphics2D g2d = (Graphics2D) graphics;
 				BufferedImage img = FileManager.loadResource("Level0/discord.png");
 				g2d.drawImage(img, 0, 0, getSize().width, getSize().height, null);
 			}
 
 		};
 
-		discordTlacitko.addActionListener(e -> {
+		discordBtn.addActionListener(e -> {
 			openWebpage("https://discord.gg/AzBmaPWQGR");
 		});
 
-		discordTlacitko.setOpaque(false);
-		discordTlacitko.setBounds(RelativeSize.rectangle(90, 80, 7, 10));
-		discordTlacitko.setVisible(true);
-		background.add(discordTlacitko);
+		discordBtn.setOpaque(false);
+		discordBtn.setBounds(RelativeSize.rectangle(90, 80, 7, 10));
+		discordBtn.setVisible(true);
+		background.add(discordBtn);
 
 		/**
 		 * //ulozit tlacitko JButton ulozitTlacitko = new JButton() {
@@ -161,7 +160,7 @@ public class Level0 {
 		 * g2d.drawImage(img, 0, 0, getSize().width, getSize().height, null);
 		 * }
 		 * 
-		 * }; ulozitTlacitko.addActionListener(e -> { ulozitCasy(); });
+		 * }; ulozitTlacitko.addActionListener(e -> { saveTime(); });
 		 * ulozitTlacitko.setOpaque(false);
 		 * ulozitTlacitko.setBounds(RelatvniVelikost.rectangle(90, 65, 7, 10));
 		 * ulozitTlacitko.setVisible(true);
@@ -171,7 +170,7 @@ public class Level0 {
 
 	}
 
-	protected void zalozitUcet() {
+	protected void createAccount() {
 		JsonObject jo1 = new JsonObject();
 		jo1.addProperty("Level1", 2147483647);
 		jo1.addProperty("Level2", 2147483647);
@@ -187,7 +186,7 @@ public class Level0 {
 		}
 	}
 
-	private void ulozitCasy() {
+	private void saveTime() {
 		JsonObject jo = new JsonObject();
 		jo.addProperty("Level1", NesnupejteDrozdi.casLevel1);
 		jo.addProperty("Level2", NesnupejteDrozdi.casLevel2);
@@ -214,7 +213,7 @@ public class Level0 {
 		}
 	}
 
-	private void nacistCasy(JLabel statistika) {
+	private void updateTimes(JLabel statistic) {
 		JsonObject jo;
 		String jsonString = null;
 			try {
@@ -229,14 +228,14 @@ public class Level0 {
 			for (int i = 0; i < NesnupejteDrozdi.mapTimeList.length; i++) {
 				NesnupejteDrozdi.mapTimeList[i] = jo.get("Level3__" + i).getAsLong();
 			}
-			statistika.repaint();
+			statistic.repaint();
 		} catch (Exception e) {
 			e.printStackTrace();
 			//System.out.println("nacitani uctu {" + Main.account +"} dokonceno");
 		}
 	}
 
-	public static boolean jeplatne(String filename) {
+	public static boolean isValid(String filename) {
 		try {
 			Paths.get(filename);
 		} catch (Exception e) {
@@ -245,9 +244,9 @@ public class Level0 {
 		return true;
 	}
 
-	private JButton tlacitkoLevel3Mapa(Rectangle rect, int map) {
+	private JButton levelBtn3Mapa(Rectangle rect, int map) {
 		// tlacitko Levely
-		JButton tlacitko = new JButton() {
+		JButton button = new JButton() {
 			@Override
 			public void paintComponent(Graphics g) {
 				Graphics2D g2d = (Graphics2D) g;
@@ -257,16 +256,16 @@ public class Level0 {
 			}
 
 		};
-		tlacitko.addActionListener(e -> {
+		button.addActionListener(e -> {
 			NesnupejteDrozdi.progress = 3;
 			NesnupejteDrozdi.setLevel3Level(map);
 			end();
 		});
 		window.hlPanel.setOpaque(false);
-		tlacitko.setBounds(rect);
-		tlacitko.setVisible(true);
+		button.setBounds(rect);
+		button.setVisible(true);
 		// tlacitko.repaint();
-		return tlacitko;
+		return button;
 	}
 
 	public void end() {
@@ -276,33 +275,32 @@ public class Level0 {
 
 	}
 
-	private JButton tlacitkoLevel( Rectangle rect, int cisloLevelu) {
+	private JButton levelBtn( Rectangle rect, int levelNumber) {
 		// tlacitko Levely
-		JButton tlacitko = new JButton() {
+		JButton button = new JButton() {
 			@Override
 			public void paintComponent(Graphics g) {
 				Graphics2D g2d = (Graphics2D) g;
-				BufferedImage img = FileManager.loadResource("Level0/level" + cisloLevelu + ".png");
+				BufferedImage img = FileManager.loadResource("Level0/level" + levelNumber + ".png");
 				g2d.drawImage(img, 0, 0, getSize().width, getSize().height, null);
 			}
-
 		};
-		tlacitko.addActionListener(e -> {
-			NesnupejteDrozdi.progress = cisloLevelu;
+
+		button.addActionListener(e -> {
+			NesnupejteDrozdi.progress = levelNumber;
 			end();
 		});
 		window.hlPanel.setOpaque(false);
-		tlacitko.setBounds(rect);
-		tlacitko.setVisible(true);
+		button.setBounds(rect);
+		button.setVisible(true);
 		// tlacitko.repaint();
-		return tlacitko;
+		return button;
 	}
 
 	private String prevodCasu(long cas) {
 		if (cas == 2147483647) {
 			return "??????";
 		}
-		// String vysledek = null;
 		String sekundyText = Long.toString((cas % 60000) / 1000);
 		if ((cas % 60000) / 1000 * 60 < 10) {
 			sekundyText = "0" + sekundyText;

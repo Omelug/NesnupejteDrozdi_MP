@@ -7,8 +7,6 @@ import java.awt.Graphics2D;
 import javax.swing.JPanel;
 import java.awt.Rectangle;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
@@ -19,12 +17,12 @@ import lombok.Setter;
 import org.drozdi.game.FileManager;
 import org.drozdi.game.RelativeSize;
 import org.drozdi.game.Test;
-import org.drozdi.levels.level3.steny.*;
+import org.drozdi.levels.level3.player.Player_lvl3;
+import org.drozdi.levels.level3.walls.*;
 
 // https://youtu.be/Icd2gAHDSfY
 
 public class Panel_level3 extends JPanel{
-	private int frameCount = 0;
 	private long lastUpdateTime = System.nanoTime();
 	private double fps = 0;
 
@@ -67,7 +65,6 @@ public class Panel_level3 extends JPanel{
 	@Getter @Setter
 	private Level3 level3;
 
-	private static boolean running;
 	@Getter @Setter
 	private static BufferedImage map;
 
@@ -83,6 +80,7 @@ public class Panel_level3 extends JPanel{
 		setDoubleBuffered(true);
 		// cellSize = this.getWidth() / 40;
 		cellSize = (int) (getHeight() / 18.25);
+		//cellSize = 50;
 		Bullet.size = new Point((int) (cellSize / 2.2), (int) (cellSize / 2.2));
 
 		player = new Player_lvl3(new Point(level3.getScreenPosition().x * cellSize,
@@ -90,11 +88,10 @@ public class Panel_level3 extends JPanel{
 		shift = new Point(level3.getShift().x, level3.getShift().y);
 
 		screen = new Rectangle(0, 0, getWidth(), getHeight());
-		nastaveniZdi();
+		setUpeniZdi();
 		level3.setEnd(true);
 		cas = System.nanoTime();
 		timer = new Timer();
-		running = true;
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -115,7 +112,7 @@ public class Panel_level3 extends JPanel{
 		super.paintComponent(g);
 
 		long currentTime = System.nanoTime();
-		double elapsedTime = (currentTime - lastUpdateTime) / 1e9; // Convert nanoseconds to seconds
+		double elapsedTime = (currentTime - lastUpdateTime) / 1e9;
 		lastUpdateTime = currentTime;
 		fps = 1.0 / elapsedTime;
 
@@ -126,37 +123,37 @@ public class Panel_level3 extends JPanel{
 	private void update() {
 		wallsOnScreen = new HashSet<>();
 		for (Wall wall : walls) {
-			wall.nastav();
+			wall.setUp();
 			if (screen.intersects(wall.getHitBox())) {
 				wallsOnScreen.add(wall);
 			}
 		}
-		for (Hedgehog hedgehog : hedgehogs) {hedgehog.nastav();}
+		for (Hedgehog hedgehog : hedgehogs) {hedgehog.setUp();}
 		for (Ladder ladder : ladders) {
-			ladder.nastav();
+			ladder.setUp();
 		}
 		for (Key key : keys) {
-			key.nastav();
+			key.setUp();
 		}
 		for (Checkpoint checkpoint : checkpoints) {
-			checkpoint.nastav();
+			checkpoint.setUp();
 		}
 		for (Tower tower : towers) {
-			tower.nastav(player);
+			tower.setUp();
 		}
 		for (Slug slug : slugs) {
-			slug.nastav(player);
+			slug.setUp();
 		}
 		for (Door door : doors) {
-			door.nastav(this);
+			door.setUp();
 		}
-		player.nastav();
+		player.setUp();
 
-		Iterator<Bullet>  entityBulletIretator = entityShots.iterator();
-		while (entityBulletIretator.hasNext()) {
-			Bullet bullet = entityBulletIretator.next();
+		Iterator<Bullet>  entityBulletIterator = entityShots.iterator();
+		while (entityBulletIterator.hasNext()) {
+			Bullet bullet = entityBulletIterator.next();
 			if (!screen.intersects(bullet.getHitBox())){
-				entityBulletIretator.remove();
+				entityBulletIterator.remove();
 				break;
 			}
 		}
@@ -170,7 +167,7 @@ public class Panel_level3 extends JPanel{
 			}
 			for (Wall wall : getWallsOnScreen()) {
 				if (wall.getHitBox().intersects(bullet.getHitBox())) {
-					if (bullet.getTypStrely() == 1) {
+					if (bullet.getBulletType() == BulletType.PLAYER) {
 						playerShotsIterator.remove();
 						break;
 					}
@@ -216,10 +213,10 @@ public class Panel_level3 extends JPanel{
 		}
 
 		for (Bullet bullet : playerShots) {
-			bullet.nastav();
+			bullet.setUp();
 		}
 		for (Bullet bullet : entityShots) {
-			bullet.nastav();
+			bullet.setUp();
 		}
 
 		updateInfo();
@@ -232,11 +229,10 @@ public class Panel_level3 extends JPanel{
 
 	}
 
-	private void nastaveniZdi() {
+	private void setUpeniZdi() {
 
-		//get colors from palete
-		int wallBarva = FileManager_lvl3.palet.getRGB(0, 0);
-		int smrt = FileManager_lvl3.palet.getRGB(1, 0);
+		int wall = FileManager_lvl3.palet.getRGB(0, 0);
+		int dead = FileManager_lvl3.palet.getRGB(1, 0);
 		int ladder = FileManager_lvl3.palet.getRGB(2, 0);
 		int tower = FileManager_lvl3.palet.getRGB(3, 0);
 		int checkpoint = FileManager_lvl3.palet.getRGB(4, 0);
@@ -250,9 +246,9 @@ public class Panel_level3 extends JPanel{
 		for (int y = 0; y < map.getHeight(); y++) {
 			for (int x = 0; x < map.getWidth(); x++) {
 				int color = map.getRGB(x, y);
-				if (color == wallBarva) {
+				if (color == wall) {
 					walls.add(new Wall(x * cellSize, y * cellSize, cellSize, cellSize, this));
-				} else if (color == smrt) {
+				} else if (color == dead) {
 					hedgehogs.add(new Hedgehog(x * cellSize, y * cellSize, cellSize, cellSize, this));
 				} else if (color == ladder) {
 					ladders.add(new Ladder(x * cellSize, y * cellSize, cellSize, cellSize, this));
@@ -282,7 +278,6 @@ public class Panel_level3 extends JPanel{
 	}
 
 	public void paint(Graphics g) {
-
 		super.paint(g);
 
 		Graphics2D g2d = (Graphics2D) g;
@@ -321,7 +316,7 @@ public class Panel_level3 extends JPanel{
 				tower.draw(g2d, screen);
 				if (Test.isLinesTowers()) {
 					g2d.setColor(Color.red);
-					g2d.drawLine(player.getPosition().x + player.getSize().x / 2, player.getPosition().y + player.getSize().y / 2,
+					g2d.drawLine((int) (player.getPosition().x + player.getSize().x / 2), (int) (player.getPosition().y + player.getSize().y / 2),
 							tower.getPosition().x + cellSize - shift.x, tower.getPosition().y + cellSize);
 				}
 			}
@@ -331,7 +326,7 @@ public class Panel_level3 extends JPanel{
 				slug.draw(g2d, screen);
 				if (Test.isLinesTowers()) {
 					g2d.setColor(Color.red);
-					g2d.drawLine(player.getPosition().x + player.getSize().x / 2, player.getPosition().y + player.getSize().y / 2,
+					g2d.drawLine((int) (player.getPosition().x + player.getSize().x / 2), (int) (player.getPosition().y + player.getSize().y / 2),
 							slug.getPosition().x + cellSize - shift.x, slug.getPosition().y + cellSize);
 				}
 			}
@@ -339,10 +334,10 @@ public class Panel_level3 extends JPanel{
 		player.draw(g2d);
 
 		for (Bullet bullet : playerShots) {
-			bullet.draw(g2d, screen);
+			bullet.draw(g2d);
 		}
 		for (Bullet bullet : entityShots) {
-			bullet.draw(g2d, screen);
+			bullet.draw(g2d);
 		}
 		if (Test.isHitBoxScreen()) {
 			g2d.setColor(Color.red);

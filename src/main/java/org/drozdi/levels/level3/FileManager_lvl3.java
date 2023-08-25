@@ -9,13 +9,13 @@ public class FileManager_lvl3 {
 	public static BufferedImage bullet;
 	public static BufferedImage  palet;
 	public static BufferedImage wall, hedgehog, ladder,tower,slug, checkpoint, key, door, doorOpen;
-	public static Point[] defualtmapPosition;
+	public static Point[] defaultMapPosition;
 
 	public FileManager_lvl3() {
-		defualtmapPosition= new Point[]{new Point(13, 10),new Point(13, 10),new Point(13, 10)};
+		defaultMapPosition = new Point[]{new Point(13, 10),new Point(13, 10),new Point(13, 10)};
 
 		// map colors
-		palet = FileManager.loadResource("Level3/maps/nastaveni_barvy.bmp");
+		palet = FileManager.loadResource("Level3/maps/colors.bmp");
 
 		//player position
 		if (playerRight == null) {playerRight = FileManager.loadResource("player/right.png");}

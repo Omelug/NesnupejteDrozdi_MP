@@ -4,10 +4,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 
 @Data
 public class Wall {
@@ -24,17 +21,18 @@ public class Wall {
 		hitBox = new Rectangle(position.x- panel.getShift().x, position.y, size.x, size.y);
 	}
 
-		public void nastav() {
-			hitBox = new Rectangle(position.x - panel.getShift().x, position.y, size.x, size.y);
-		}
+	public void setUp() {
+		hitBox = new Rectangle(position.x - panel.getShift().x, position.y, size.x, size.y);
+	}
 
-		public void draw(Graphics2D g2d,Rectangle r) {
-			if (getHitBox().intersects(r)) { //aby se rendrovali jen veci na obrazovce
-				g2d.setColor(Color.gray);
-				g2d.drawImage(FileManager_lvl3.wall, hitBox.x, hitBox.y, size.x, size.y, null);
-			}
-		}
+	public void draw(Graphics2D g2d,Rectangle r) {
+		g2d.setColor(Color.gray);
+		g2d.drawImage(FileManager_lvl3.wall, hitBox.x, hitBox.y, size.x, size.y, null);
+	}
 
+	public void drawWall(Graphics2D g2d, Image image) {
+		g2d.drawImage(image, position.x,  position.y, size.x, size.y, null);
+	}
 
 	}
 

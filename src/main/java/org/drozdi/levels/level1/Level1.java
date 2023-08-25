@@ -34,7 +34,7 @@ public Level1(Window window) {
 		
 		window.smazat();
 		zaklad(window);
-		window.nastavOtazku(window, window.answerPanel, window.otazkyLabel, tlacitko1, tlacitko2, otazka,
+		window.setUpOtazku(window, window.answerPanel, window.otazkyLabel, tlacitko1, tlacitko2, otazka,
 				"Vyhodit droždí do koše", "Vyšňupat droždí");
 
 
@@ -121,7 +121,7 @@ public Level1(Window window) {
 		// System.out.println("Tlacitko");
 		if (stav != 0) {
 			if (nasnupano >= 100) {
-				mistniWindow.nastavOtazku(mistniWindow, mistniWindow.answerPanel, mistniWindow.otazkyLabel, tlacitko1,
+				mistniWindow.setUpOtazku(mistniWindow, mistniWindow.answerPanel, mistniWindow.otazkyLabel, tlacitko1,
 						tlacitko2, "Našňupáno prostě hodně droždí !! ", "Jít dál", "Jít dál");
 				stav = 2; // aby se zmenily listenery tlacitka na konecnou funkci
 

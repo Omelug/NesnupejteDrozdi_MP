@@ -4,7 +4,6 @@ import org.drozdi.game.FileManager;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
-
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.JButton;
@@ -12,11 +11,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.awt.Rectangle;
 
-@SuppressWarnings("serial")
 public class Story0 extends JPanel {
 	JLabel textLabel = new JLabel();
 	Window window;
-	JButton zpet = new JButton();
+	JButton back = new JButton();
 	JButton dal = new JButton();
 
 	// zakladni 
@@ -28,7 +26,6 @@ public class Story0 extends JPanel {
 		
 		//window.smazat();
 		window.defOkno();
-
 		zaklad(text);
 	}
 
@@ -47,37 +44,37 @@ public class Story0 extends JPanel {
 		textLabel.setHorizontalAlignment(getWidth() / 2);
 
 		window.hlPanel.add(textLabel);
-		nastavBarvy(new Color(80, 80, 80), new Color(36, 137, 176));
-		nastavSpodniListu("zpět", "dále");
+		setUpColor(new Color(80, 80, 80), new Color(36, 137, 176));
+		setUpDownBar();
 		
 		nastavPribeh(text);
 		// zakladni nastaveni
-				if (textLabel.getText() == null)
-					nastavPribeh("Ticho jako po pěšině...");
+		if (textLabel.getText() == null)
+			nastavPribeh("Ticho jako po pěšině...");
 	}
 
 	public void nastavPribeh(String textPribeh) {
 		textLabel.setText(textPribeh);
 	}
 
-	public void nastavBarvy(Color barva1, Color barva2) {
-		window.hlPanel.setBackground(barva1);
-		window.answerPanel.setBackground(barva2);
+	public void setUpColor(Color color1, Color color2) {
+		window.hlPanel.setBackground(color1);
+		window.answerPanel.setBackground(color2);
 	}
 
-	public void nastavSpodniListu(String string, String string2) {
-		
-		zpet.setBounds(new Rectangle(RelativeSize.percentageX(2), RelativeSize.percentageY(10,window.answerPanel.getHeight()), RelativeSize.percentageX(10), RelativeSize.percentageY(80,window.answerPanel.getHeight())));
-		zpet.setIcon(Window.resizeImage(FileManager.loadImageIcon(quit),zpet.getWidth(), zpet.getHeight()));
-		zpet.setBorder(null);
-		zpet.setOpaque(false);
-		zpet.addActionListener(e -> {
+	public void setUpDownBar() {
+
+		back.setBounds(new Rectangle(RelativeSize.percentageX(2), RelativeSize.percentageY(10,window.answerPanel.getHeight()), RelativeSize.percentageX(10), RelativeSize.percentageY(80,window.answerPanel.getHeight())));
+		back.setIcon(Window.resizeImage(FileManager.loadImageIcon(quit),back.getWidth(), back.getHeight()));
+		back.setBorder(null);
+		back.setOpaque(false);
+		back.addActionListener(e -> {
 			synchronized (this) {
-				NesnupejteDrozdi.jitdal = false;
+				NesnupejteDrozdi.progressContinue = false;
 				notify();
 			}
 		});
-		window.answerPanel.add(zpet);
+		window.answerPanel.add(back);
 		
 		dal.setBounds(new Rectangle(RelativeSize.percentageX(88), RelativeSize.percentageY(10,window.answerPanel.getHeight()), RelativeSize.percentageX(10), RelativeSize.percentageY(80,window.answerPanel.getHeight())));
 		dal.setIcon(Window.resizeImage(FileManager.loadImageIcon(sipka),dal.getWidth(), dal.getHeight()));
@@ -86,7 +83,7 @@ public class Story0 extends JPanel {
 		dal.setBorder(null);
 		dal.addActionListener(e -> {
 			synchronized (this) {
-				NesnupejteDrozdi.jitdal = true;
+				NesnupejteDrozdi.progressContinue = true;
 				notify();
 			}
 		});
@@ -94,8 +91,7 @@ public class Story0 extends JPanel {
 		window.answerPanel.repaint();
 	}
 
-	public void cekatNaVstup() {
-		
+	public void waitForInput() {
 		synchronized (this) {
 			try {
 				wait();
@@ -104,7 +100,7 @@ public class Story0 extends JPanel {
 			}
 		}
 		window.hlPanel.remove(textLabel);
-		window.answerPanel.remove(zpet);
+		window.answerPanel.remove(back);
 		window.answerPanel.remove(dal);
 		System.out.println("KONEC -- Pribeh   " + Thread.currentThread());
 	}

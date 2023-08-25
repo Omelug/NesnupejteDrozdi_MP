@@ -1,8 +1,8 @@
-package org.drozdi.levels.level3.steny;
+package org.drozdi.levels.level3.walls;
 
 import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
-import org.drozdi.levels.level3.Player_lvl3;
+import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.Wall;
 
 import java.awt.Graphics2D;
@@ -19,15 +19,15 @@ public class Door extends Wall {
 		open = this.maxKeys;
 	}
 
-	public void nastav(Panel_level3 panel) {
-		nastav();
+	public void setUp(Panel_level3 panel) {
+		setUp();
 		open = maxKeys - panel.getLevel3().getKeyCount();
 	}
 
-	public void kontrolaKolize(Player_lvl3 player) {
+	public void collisionControl(Player_lvl3 player) {
 		if (open <= 0) {
 			if (player.getHitBox().intersects(getHitBox())) {
-				getPanel().getLevel3().ulozeniCasu();
+				getPanel().getLevel3().saveTime();
 				getPanel().getLevel3().setDeathCount(-1);
 				getPanel().getLevel3().setSavedKeyList(null);
 				getPanel().getLevel3().setDeathCount(-1);

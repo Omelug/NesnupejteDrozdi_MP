@@ -11,7 +11,7 @@ public class Story1 {
 				+ "  </div></body></html>";
 		
 		Story0 story0 = new Story0(window, text);
-		story0.cekatNaVstup();
+		story0.waitForInput();
 		System.out.println("KONEC --Pribeh1    " + Thread.currentThread());
 	}
 

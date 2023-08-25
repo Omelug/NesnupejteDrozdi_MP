@@ -1,26 +1,24 @@
-package org.drozdi.levels.level3;
+package org.drozdi.levels.level3.player;
 
-import java.awt.Point;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.geom.Point2D;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Test;
-import org.drozdi.levels.level3.steny.*;
-
-import java.awt.Rectangle;
-import java.awt.Graphics2D;
-import java.awt.FontMetrics;
+import org.drozdi.levels.level3.Bullet;
+import org.drozdi.levels.level3.FileManager_lvl3;
+import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.Wall;
+import org.drozdi.levels.level3.walls.*;
 
 public class Player_lvl3 {
-	private Panel_level3 panel;
+	private final Panel_level3 panel;
 	@Getter @Setter
 	private Point position;
 	@Getter @Setter
-	private Point size;
+	private Point2D.Double size;
 	@Getter @Setter
 	private Point2D.Double speed;
 	@Getter @Setter
@@ -33,7 +31,7 @@ public class Player_lvl3 {
 	@Getter @Setter
 	private boolean onGround = false;
 	@Getter @Setter
-	private int direction = 1; // 0- nahoru, 1- pravo, 2 - dolu , 3 - levo
+	private Direction direction = Direction.RIGHT;
 	@Getter @Setter
 	private int shot = 0;
 	@Getter @Setter
@@ -41,25 +39,25 @@ public class Player_lvl3 {
 
 	public Player_lvl3(Point screenPosition, Panel_level3 panel) {
 		this.panel = panel;
-		size = new Point((int) (0.9 * panel.getCellSize()), (int) (0.9 * panel.getCellSize()));
+		size = new Point2D.Double((0.9 * panel.getCellSize()), (0.9 * panel.getCellSize()));
 		speed = new Point2D.Double(0, 0);
 		if (screenPosition == null) {
-			position = new Point(panel.getX() + panel.getWidth() / 2 - size.x / 2,
-					panel.getY() + panel.getHeight() / 2 - size.y / 2);
+			position = new Point((int) (panel.getX() + panel.getWidth() / 2 - size.x / 2),
+					(int) (panel.getY() + panel.getHeight() / 2 - size.y / 2));
 		} else {
 			position = screenPosition;
 		}
-		hitBox = new Rectangle(position.x, position.y, size.x, size.y);
+		hitBox = new Rectangle(position.x, position.y, (int) size.x, (int) size.y);
 	}
 
-	public void nastav() {
+	public void setUp() {
 		double srovanani = (double) panel.getCellSize() /30;
 		if (onGround) {
 			speedMax = new Point2D.Double(6*srovanani, 6*srovanani);
 		} else {
 			speedMax = new Point2D.Double(4*srovanani, 6*srovanani);
 		}
-		// nastaveni pohybu X
+		// setUpeni pohybu X
 		if (left && right || !left && !right)
 			speed.x *= 0.8;
 		else if (left)
@@ -82,8 +80,8 @@ public class Player_lvl3 {
 			onGround = false;
 		}
 		speed.y += 0.3*srovanani;
-		// x kolize
-		//speed.x = speed.x*srovanani;
+
+		// x collision
 		hitBox.x += speed.x;
 		for (Wall wall : panel.getWallsOnScreen()) {
 			if (hitBox.intersects(wall.getHitBox())) {
@@ -95,12 +93,13 @@ public class Player_lvl3 {
 				position.x = hitBox.x;
 			}
 		}
+
 		// ladders
 		onGround = false;
 		for (Ladder ladder : panel.getLadders()) {
 			if (hitBox.intersects(ladder.getHitBox())) {
 				onGround = true;
-				direction = 0;
+				direction = Direction.UP;
 				if (up) {
 					speed.y = -speedMax.y;
 				} else if (down) {
@@ -110,8 +109,8 @@ public class Player_lvl3 {
 				}
 			}
 		}
-		// y kolize
-		//speed.y = speed.y*srovanani;
+
+		// y collision
 		hitBox.y += speed.y;
 		for (Wall wall : panel.getWallsOnScreen()) {
 			if (hitBox.intersects(wall.getHitBox())) {
@@ -125,12 +124,12 @@ public class Player_lvl3 {
 				position.y = hitBox.y;
 			}
 		}
-		// nasteveni direction
+
 		if (speed.x > 0) {
-			direction = 1;
+			direction = Direction.RIGHT;
 		}
 		if (speed.x < 0) {
-			direction = 3;
+			direction = Direction.LEFT;
 		}
 		
 		
@@ -142,9 +141,10 @@ public class Player_lvl3 {
 		panel.getShift().x += speed.x;
 		panel.getShift().y += speed.y;
 		if (down) {
-			direction = 2;
+			direction = Direction.DOWN;
 		}
 		shot();
+
 		// zjistuje zda byl zasazena
 		for (Bullet bullet : panel.getEntityShots()) {
 			if (hitBox.intersects(bullet.getHitBox())) {
@@ -153,36 +153,32 @@ public class Player_lvl3 {
 		}
 		// zjistuje zda dopad na hedgehog
 		for (Hedgehog hedgehog : panel.getHedgehogs()) {
-			hedgehog.kontrolaKolize(this);
+			hedgehog.collisionControl(this);
 		}
 		// zjistuje zda je na checkpointu
 		for (Checkpoint checkpoint : panel.getCheckpoints()) {
-			checkpoint.kontrolaKolize(this);
+			checkpoint.collisionControl(this);
 		}
 		//zda šel na door
 		for (Door door : panel.getDoors()) {
-			door.kontrolaKolize(this);
+			door.collisionControl(this);
 		}
 	}
 
-	@SuppressWarnings("unused")
 	public void draw(Graphics2D g2d) {
 		g2d.setColor(Color.cyan);
 		FontMetrics fm = g2d.getFontMetrics();
-	    int x = position.x + size.x /2 -(fm.stringWidth(NesnupejteDrozdi.account)) / 2;
+	    int x = (int) (position.x + size.x /2 -(fm.stringWidth(NesnupejteDrozdi.account)) / 2);
 		g2d.drawString(NesnupejteDrozdi.account, x, position.y -10);
-		//g2d.drawString((position.x + panel.shift.x) + ";" + (position.y + panel.shift.y) + "(" + panel.playerShots.size()
-		//		+ ")" + "(" + panel.entityShots.size() + ")\n+ " + "(" + onGround + ")", position.x, position.y);
-		if (direction == 1) {
-			g2d.drawImage(FileManager_lvl3.playerRight, position.x, position.y, size.x, size.y, null);
-		} else if (direction == 3) {
-			g2d.drawImage(FileManager_lvl3.playerLeft, position.x, position.y, size.x, size.y, null);
-		} else if (direction == 0) {
-			g2d.drawImage(FileManager_lvl3.playerUp, position.x, position.y, size.x, size.y, null);
-		} else if (direction == 2) {
-			g2d.drawImage(FileManager_lvl3.playerDown, position.x, position.y, size.x, size.y, null);
+		g2d.drawString((position.x + panel.getShift().x) + ";" + (position.y + panel.getShift().y) + "(" + panel.getPlayerShots().size()
+			+ ")" + "(" + panel.getEntityShots().size() + ")\n+ " + "(" + onGround + ")", position.x, position.y);
+		switch (direction){
+			case UP -> drawPlayer(g2d,FileManager_lvl3.playerUp);
+			case RIGHT -> drawPlayer(g2d,FileManager_lvl3.playerRight);
+			case DOWN -> drawPlayer(g2d,FileManager_lvl3.playerDown);
+			case LEFT -> drawPlayer(g2d,FileManager_lvl3.playerLeft);
 		}
-		// hitbox
+
 		if (Test.isHitBoxPlayer()) {
 			g2d.setColor(Color.green);
 			g2d.draw(hitBox);
@@ -190,9 +186,13 @@ public class Player_lvl3 {
 
 	}
 
+	public void drawPlayer(Graphics2D g2d, Image image){
+		g2d.drawImage(image, position.x, position.y, (int) size.x, (int) size.y, null);
+	}
+
 	public synchronized void shot() {
 		shot++;
-		if (shot > 20 && (shooting || direction == 2)) {
+		if (shot > 20 && (shooting || direction == Direction.DOWN)) {
 			shot = 0;
 			panel.getPlayerShots().add(new Bullet(panel, this));
 		}

@@ -1,7 +1,8 @@
-package org.drozdi.levels.level3.steny;
+package org.drozdi.levels.level3.walls;
 
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.*;
+import org.drozdi.levels.level3.player.Player_lvl3;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -17,7 +18,7 @@ public class Slug extends Wall {
 		this.panel = panel;
 	}
 
-	public void nastav(Player_lvl3 player) {
+	public void setUp(Player_lvl3 player) {
 	  	setHitBox(new Rectangle(getPosition().x - panel.getShift().x, getPosition().y, getSize().x, getSize().y));
 		if (getHitBox().intersects(panel.getScreen())) {
 			shoot++;

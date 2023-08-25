@@ -3,12 +3,12 @@ package org.drozdi.levels.level2;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Pohyb implements KeyListener {
+public class Move implements KeyListener {
 	Vozik vozik;
 	Panel panel;
 	public boolean vozikJede;
 
-	public Pohyb(Vozik vozik, Panel panel) {
+	public Move(Vozik vozik, Panel panel) {
 		this.vozik = vozik;
 		this.panel = panel;
 	}

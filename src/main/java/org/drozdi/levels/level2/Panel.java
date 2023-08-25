@@ -31,7 +31,7 @@ public class Panel extends JPanel implements Runnable {
 	public static ImageIcon drozdi;
 	public static ImageIcon kecup;
 	public static ImageIcon clock;
-	public Pohyb keyK;
+	public Move keyK;
 	int pocetDrozdi = 0, pocetKecup = 0;
 	int drozdiMax = 20;
 	JLabel pocitadloDrozdi, pocitadloKecup, pocitadloStopky;
@@ -51,11 +51,11 @@ public class Panel extends JPanel implements Runnable {
 		kecup = Window.resizeImage(new ImageIcon("rsc/Level2/kecup.png"), Food.size, Food.size);
 		clock = Window.resizeImage(new ImageIcon("rsc/Level2/time.png"), Food.size, Food.size);
 		
-		// nastaveni voziku
+		// setUpeni voziku
 		Vozik vozik = new Vozik(getWidth(), getHeight());
 		this.vozik = vozik;
 
-		keyK = new Pohyb(vozik, this);
+		keyK = new Move(vozik, this);
 		addKeyListener(keyK);
 		
 		setFocusable(true);
@@ -112,12 +112,10 @@ public class Panel extends JPanel implements Runnable {
 		startTlacitko.setBackground(Color.green);
 		startTlacitko.setOpaque(true);
 		startTlacitko.setHorizontalAlignment(JLabel.CENTER);
+
 		window.answerPanel.add(startTlacitko);
 
-		// start button
-		window.answerPanel.add(startTlacitko);
 		startTlacitko.addChangeListener(new ChangeListener() {
-
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				JButton b = (JButton) e.getSource();
@@ -179,7 +177,7 @@ public class Panel extends JPanel implements Runnable {
 
 	@Override
 	public void run() {
-		double intervalCas = 1000000000 / FPS; // prevod jednotek
+		double intervalCas = (double) 1_000_000_000 / FPS; // prevod jednotek
 		double delta = 0;
 		long minulyCas = System.nanoTime();
 		long cas;
@@ -217,7 +215,7 @@ public class Panel extends JPanel implements Runnable {
 					startTlacitko.setVisible(false);
 					startTlacitko.removeChangeListener(this);
 					System.out.println("KONEC tlacitko  " + Thread.currentThread());
-					level2.ulozeniCasu();
+					level2.saveTime();
 					end();
 				}
 			}
@@ -225,10 +223,10 @@ public class Panel extends JPanel implements Runnable {
 		});
 	}
 	public void end() {
-		synchronized (Level2.t) {
+		synchronized (Level2.thread) {
 			try {
 				mistniWindow.smazat();
-				Level2.t.notify();
+				Level2.thread.notify();
 			} catch (Exception e2) {
 				System.out.println("CHYBA  -- KONEC tlacitko" + Thread.currentThread());
 			}
@@ -245,7 +243,7 @@ public class Panel extends JPanel implements Runnable {
 					vozik.misto = getWidth() - vozik.sirka;
 				}
 			}
-			if (vozik.otocenDoPrava == false) {
+			if (!vozik.otocenDoPrava) {
 				vozik.misto -= vozik.speed;
 				vozikimg = vozik.imgL;
 				if (vozik.misto < 0) {

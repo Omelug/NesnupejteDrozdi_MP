@@ -1,10 +1,9 @@
-package org.drozdi.levels.level3.steny;
+package org.drozdi.levels.level3.walls;
 
 import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
-import org.drozdi.levels.level3.Player_lvl3;
+import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.Wall;
-
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
@@ -13,11 +12,11 @@ public class Checkpoint extends Wall {
 		super(x, y, sizeX, sizeY, panel);
 	}
 
-	public void nastav() {
+	public void setUp() {
 		setHitBox(new Rectangle(getPosition().x - getPanel().getShift().x, getPosition().y - 1, getSize().x, getSize().y + 1));
 	}
 
-	public void kontrolaKolize(Player_lvl3 player) {
+	public void collisionControl(Player_lvl3 player) {
 		if (player.getHitBox().intersects(getHitBox())) {
 			getPanel().getLevel3().getShift().x = getPanel().getShift().x+ (getHitBox().x - player.getHitBox().x);
 			getPanel().getLevel3().getDefaultPosition().x = getPosition().x / getPanel().getCellSize();
