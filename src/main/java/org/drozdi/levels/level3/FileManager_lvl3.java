@@ -11,7 +11,7 @@ public class FileManager_lvl3 {
 	public static BufferedImage wall, hedgehog, ladder,tower,slug, checkpoint, key, door, doorOpen;
 	public static Point[] defaultMapPosition;
 
-	public FileManager_lvl3() {
+	public static void loadResources() {
 		defaultMapPosition = new Point[]{new Point(13, 10),new Point(13, 10),new Point(13, 10)};
 
 		// map colors

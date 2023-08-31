@@ -2,42 +2,55 @@ package org.drozdi.levels.level3.walls;
 
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.*;
-import org.drozdi.levels.level3.player.Player_lvl3;
+import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.HitBoxHelper;
 
-import java.awt.Color;
-import java.awt.Rectangle;
+
+import java.awt.*;
 
 public class Tower extends Wall {
-	Panel_level3 panel;
+	public static final double MAX_DISTANCE = 200; //TODO check
 	int shot = 0;
 
-	public Tower(int x, int y, int sizeX, int sizeY, Panel_level3 panel) {
-		super(x, y, sizeX * 2, sizeY * 2, panel);
-		setHitBox(new Rectangle((int) (getPosition().x - panel.getShift().x+panel.getCellSize()/2), getPosition().y, getSize().x-panel.getCellSize(), getSize().y));
-		this.panel = panel;
+	public Tower(int x, int y) {
+		super(x, y, 2, 2);
 	}
 
-	public void setUp(Player_lvl3 player) {
-		setHitBox(new Rectangle((int) (getPosition().x - panel.getShift().x+panel.getCellSize()/2), getPosition().y, getSize().x-panel.getCellSize(), getSize().y));
-		if (getHitBox().intersects(panel.getScreen())) {
-			shot++;
-			if (shot > 80) {
-				shot = 0;
-				panel.getEntityShots().add(new Bullet(panel, this, player));
-			}
+	@Override
+	public Rectangle getHitBox(Panel_level3 panel) {
+		return new Rectangle((int) (getPosition().x - panel.getShift().x + 1/2),
+				getPosition().y, (int) (getSize().x- 1), (int) getSize().y);
+	}
+
+	public void shot(PlayerMP nearestPlayer, HitBoxHelper hitBoxHelper) {
+		shot++;
+		if (shot > 80) {
+			shot = 0;
+			hitBoxHelper.getMapHelper().getEntityShots().add(new Bullet(this, nearestPlayer));
 		}
 	}
 	@Override
-	public void draw() {
-		getPanel().getG2d().drawImage(FileManager_lvl3.tower,	getHitBox().x - panel.getCellSize()/2, getHitBox().y, getSize().x, getSize().y, null);
-		if (Test.isHitBoxTower()) {
-			getPanel().getG2d().setColor(Color.green);
-			getPanel().getG2d().draw(getHitBox());
+	public void draw(Panel_level3 panel) {
+		Rectangle hitBox = getHitBox(panel);
+		if (panel.getScreen().intersects(hitBox)) { //TODO hitbox je maly, takze to bude platit vzdy, zkontrolovat u dalsich
+			panel.getG2d().drawImage( FileManager_lvl3.tower,
+					(int) (getHitBox(panel).x * panel.getCellSize() - (0.5 * panel.getCellSize())),
+					(getHitBox(panel).y) * panel.getCellSize(),
+					(int) getSize().x * panel.getCellSize(),
+					(int) getSize().y * panel.getCellSize(), null);
+
+			if (Test.isHitBoxTower()) {
+				panel.getG2d().setColor(Color.green);
+				panel.drawHitBox(getHitBox(panel));
+			}
 		}
 	}
-	public void drawLine(Player_lvl3 player) {
-		getPanel().getG2d().setColor(Color.orange);
-		getPanel().getG2d().drawLine((int) (player.getPosition().x + player.getSize().x / 2), (int) (player.getPosition().y + player.getSize().y / 2),
-				(int) (getPosition().x + getPanel().getCellSize() - getPanel().getShift().x), getPosition().y + getPanel().getCellSize());
+	public void drawLine(PlayerMP player, Panel_level3 panel) {
+		panel.getG2d().setColor(Color.orange);
+		panel.getG2d().drawLine(
+				(int) ((player.getPosition().x + player.getSize().x / 2) * panel.getCellSize()),
+				(int) ((player.getPosition().y + player.getSize().y / 2) * panel.getCellSize()),
+				(int) (((getPosition().x + 0.5)* panel.getCellSize() - panel.getShift().x)),
+				(getPosition().y + 1) * panel.getCellSize());
 	}
 }

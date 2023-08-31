@@ -15,7 +15,7 @@ public class Story2 {
 		
 		Story0 story0 = new Story0(window, text);
 		story0.waitForInput();
-		System.out.println("KONEC --Pribeh2    " + Thread.currentThread());
+		System.out.println("END --Story2    " + Thread.currentThread());
 	}
 
 }

@@ -1,51 +1,47 @@
 package org.drozdi.levels.level3.walls;
 
+import lombok.*;
 import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
-import org.drozdi.levels.level3.player.Player_lvl3;
 import org.drozdi.levels.level3.Wall;
-import java.awt.Point;
+import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.GameServer;
 
 public class Door extends Wall {
-	public int maxKeys;
-	public int open;
-
-	public Door(int x, int y, int sizeX, int sizeY, Panel_level3 panel, int max) {
-		super(x, y, sizeX, sizeY, panel);
+	@Getter
+	private final int maxKeys;
+	@Getter @Setter
+	private boolean open;
+	public Door(int x, int y, int max) {
+		super(x, y, 2, 2);
 		this.maxKeys = max;
-		open = this.maxKeys;
 	}
 
-	public void setUp(Panel_level3 panel) {
-		setUp();
-		open = maxKeys - panel.getLevel3().getKeyCount();
+	public boolean open(GameServer gameServer) {
+		return ((maxKeys - gameServer.getKeys()) <= 0);
 	}
 
-	public void collisionControl(Player_lvl3 player) {
-		if (open <= 0) {
-			if (player.getHitBox().intersects(getHitBox())) {
-				getPanel().getLevel3().saveTime();
-				getPanel().getLevel3().setDeathCount(-1);
+	public void collisionControl(PlayerMP player) {
+		if (open && player.getHitBoxServer().intersects(getHitBoxServer())) {
+				//TODO end
+				/**player.setDeathCount(-1);
 				getPanel().getLevel3().setSavedKeyList(null);
-				getPanel().getLevel3().setDeathCount(-1);
 				getPanel().getLevel3().setKeyCount(0);
 				getPanel().getLevel3().setEnd(false);
 				Point p = new Point((Point) getPanel().getShift().clone());
 				p.x = 0;
 				getPanel().setShift(p);
 				getPanel().setDefaultScreenPosition ((Point) getPanel().getDefaultScreenPosition().clone());
-				getPanel().end();
-			}
+				getPanel().end();**/
 		}
-
 	}
 
-	public void draw() {
-		if (getPanel().getScreen().intersects(getHitBox())) {
-			if (open > 0) {
-				getPanel().getG2d().drawImage(FileManager_lvl3.door, getHitBox().x, getHitBox().y, getHitBox().x, getHitBox().y, null);
+	public void draw(Panel_level3 panel) {
+		if (panel.getScreen().intersects(getHitBox(panel))) {
+			if (open) {
+				drawWall(FileManager_lvl3.door, panel);
 			}else {
-				getPanel().getG2d().drawImage(FileManager_lvl3.doorOpen, getHitBox().x, getHitBox().y, getHitBox().x, getHitBox().y, null);
+				drawWall(FileManager_lvl3.doorOpen,panel);
 			}
 		}
 	}

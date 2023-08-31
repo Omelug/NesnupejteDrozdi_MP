@@ -6,13 +6,11 @@ import org.drozdi.levels.level3.Wall;
 
 
 public class Key extends Wall {
-	public Key(int x, int y, int sizeX, int sizeY, Panel_level3 panel) {
-		super(x, y, sizeX, sizeY, panel);
+	public Key(int x, int y) {
+		super(x, y);
 	}
-
 	@Override
-	public void draw() {
-		drawOnScreen(FileManager_lvl3.key);
+	public void draw(Panel_level3 panel) {
+		drawOnScreen(FileManager_lvl3.key, panel);
 	}
-
 }

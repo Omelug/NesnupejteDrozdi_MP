@@ -6,18 +6,20 @@ import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
 
 import javax.swing.*;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.io.*;
+import java.net.*;
+import java.nio.file.*;
+import java.time.LocalTime;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.drozdi.levels.level3.Level3;
 
 import static java.lang.Thread.currentThread;
 
@@ -26,18 +28,20 @@ public class Level0 {
 	private Thread thread;
 	private FileManager_lvl0 fileManagerLvl0 = new FileManager_lvl0();
 	private JLabel background;
+	private static JButton checkConnection;
+	private static JButton connectBtn;
 
 	public Level0(Window window) {
 		this.window = window;
 		thread = currentThread();
 		fileManagerLvl0.load();
-		window.smazat();
-		window.defOkno();
+		window.clean();
+		window.defineWindow();
 		window.setLayout(null);
 
 		background = new JLabel();
 		background.setBounds(new Rectangle(0, 0,100,170));
-		background.setIcon(FileManager.loadImageIcon("Level0/drozdiNahore.png"));
+		background.setIcon(FileManager.loadImageIcon("Level0/drozdiTitle.png"));
 		background.setBounds(0,0, RelativeSize.getMaxWindowSize().x, RelativeSize.getMaxWindowSize().y);
 		window.add(background);
 
@@ -51,12 +55,12 @@ public class Level0 {
 			try {
 				wait();
 			} catch (InterruptedException ex) {
-				System.out.println("CHYBA -- Level0");
+				System.out.println("ERROR -- Level0");
 			}
 
 		}
-		window.smazat();
-		System.out.println("KONEC Level0");
+		window.clean();
+		System.out.println("END Level0");
 	}
 
 	void base(Window window, JLabel background) {
@@ -74,14 +78,15 @@ public class Level0 {
 		background.add(levelBtn(RelativeSize.rectangle(10, 65, 20, 10), 3));
 
 		// level3 mapy
-		background.add(levelBtn3Mapa(RelativeSize.rectangle(15, 80, 7, 10), 0));
-		background.add(levelBtn3Mapa(RelativeSize.rectangle(25, 80, 7, 10), 1));
-		background.add(levelBtn3Mapa(RelativeSize.rectangle(35, 80, 7, 10), 2));
-		background.add(levelBtn3Mapa(RelativeSize.rectangle(45, 80, 7, 10), 3));
-		background.add(levelBtn3Mapa(RelativeSize.rectangle(55, 80, 7, 10), 4));
-		background.add(levelBtn3Mapa(RelativeSize.rectangle(65, 80, 7, 10), 5));
+		background.add(levelBtn3Map(RelativeSize.rectangle(15, 80, 7, 10), 0));
+		background.add(levelBtn3Map(RelativeSize.rectangle(25, 80, 7, 10), 1));
+		background.add(levelBtn3Map(RelativeSize.rectangle(35, 80, 7, 10), 2));
+		background.add(levelBtn3Map(RelativeSize.rectangle(45, 80, 7, 10), 3));
+		background.add(levelBtn3Map(RelativeSize.rectangle(55, 80, 7, 10), 4));
+		background.add(levelBtn3Map(RelativeSize.rectangle(65, 80, 7, 10), 5));
 
-		JLabel statistika = new JLabel() {
+		JLabel statistics = new JLabel() {
+			@Override
 			public void paintComponent(Graphics g) {
 				Graphics2D g2d = (Graphics2D) g;
 				g2d.setColor(java.awt.Color.blue);
@@ -92,44 +97,78 @@ public class Level0 {
 				g.setFont(g.getFont().deriveFont(12f));
 				g.drawString("Časy:", 20, 100);
 
-				g2d.drawString("Level1:           " + timeTransform(NesnupejteDrozdi.casLevel1), 20, 120);
-				g2d.drawString("Level2:           " + timeTransform(NesnupejteDrozdi.casLevel2), 20, 140);
+				g2d.drawString("Level1:           " + timeTransform(NesnupejteDrozdi.timeLevel1), 20, 120);
+				g2d.drawString("Level2:           " + timeTransform(NesnupejteDrozdi.timeLevel2), 20, 140);
 				for (int i = 0; i < NesnupejteDrozdi.mapTimeList.length; i++) {
 					g2d.drawString("Level3/map" + i + ":       " + timeTransform(NesnupejteDrozdi.mapTimeList[i]), 20, 160 + 20 * i);
 
 				}
 			}
 		};
-		statistika.setBounds(RelativeSize.rectangle(35, 35, 20, 40));
+		statistics.setBounds(RelativeSize.rectangle(35, 35, 20, 40));
 
 		JTextField newAccount = new JTextField();
-		newAccount.setBounds(RelativeSize.percentageX(10, statistika.getWidth()), 50,
-				RelativeSize.percentageX(60, statistika.getWidth()), 20);
-		statistika.add(newAccount);
+		newAccount.setBounds(RelativeSize.percentageX(10, statistics.getWidth()), 50, RelativeSize.percentageX(60, statistics.getWidth()), 20);
+		statistics.add(newAccount);
 		newAccount.addActionListener(e -> {
 			saveTime();
 			NesnupejteDrozdi.account = newAccount.getText();
-			NesnupejteDrozdi.accountPath = "login/" + NesnupejteDrozdi.account + ".json";
-			File fileCheck = new File(Window.ziskatCestu(NesnupejteDrozdi.accountPath));
-			if (fileCheck.exists() && !fileCheck.isDirectory()) {
-				updateTimes(statistika);
-			}else {
+
+			File fileCheck = new File(Window.getPath(NesnupejteDrozdi.accountPath));
+			if (!(fileCheck.exists() && !fileCheck.isDirectory())) {
 				if (isValid(newAccount.getText()) && !newAccount.getText().isEmpty()) {
 					createAccount();
-					updateTimes(statistika);
 				}else {
 					NesnupejteDrozdi.account = "NeplatnyZnaky";
-					NesnupejteDrozdi.accountPath = "login/" + NesnupejteDrozdi.account + ".json";
-					updateTimes(statistika);
 				}
 			}
+
 			NesnupejteDrozdi.accountPath = "login/" + NesnupejteDrozdi.account + ".json";
 			newAccount.setText("");
-			statistika.repaint();
-			updateTimes(statistika);
+			updateTimes(statistics);
 
+			statistics.repaint();
 		});
-		background.add(statistika);
+
+		JTextField newIpAddress = new JTextField();
+		newIpAddress.setBounds(RelativeSize.percentageX(5, statistics.getWidth()), 320, RelativeSize.percentageX(50, statistics.getWidth()), 20);
+		statistics.add(newIpAddress);
+		newIpAddress.setText(String.valueOf(NesnupejteDrozdi.getClient().getIpAddress()));
+		newIpAddress.addActionListener(e -> {
+			try {
+				NesnupejteDrozdi.getClient().setIpAddress(InetAddress.getByName(newIpAddress.getText()));
+			} catch (UnknownHostException ex) {
+				ex.printStackTrace();
+			}
+		});
+
+		JTextField newPort = new JTextField();
+		newPort.setBounds(RelativeSize.percentageX(55, statistics.getWidth()), 320,RelativeSize.percentageX(20, statistics.getWidth()), 20);
+		statistics.add(newPort);
+		newPort.setText(String.valueOf(NesnupejteDrozdi.getClient().getPort()));
+		((AbstractDocument) newPort.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
+		newPort.addActionListener(e -> {
+			NesnupejteDrozdi.getClient().setPort(Integer.parseInt(newPort.getText()));
+		});
+
+		checkConnection = new JButton();
+		checkConnection.setBounds(RelativeSize.percentageX(5, statistics.getWidth()), 345,RelativeSize.percentageX(70, statistics.getWidth()), 20);
+		statistics.add(checkConnection);
+		checkConnection.setText("check");
+		checkConnection.addActionListener(e -> {
+			//NesnupejteDrozdi.getClient().sendData("ping".getBytes());
+			//NesnupejteDrozdi.getClient().getMap();
+		});
+		connectBtn = new JButton();
+		connectBtn.setBounds(RelativeSize.percentageX(5, statistics.getWidth()), 365,RelativeSize.percentageX(70, statistics.getWidth()), 20);
+		statistics.add(connectBtn);
+		connectBtn.setText("connect");
+		connectBtn.addActionListener(e -> {
+			NesnupejteDrozdi.setProgress(4);//TODO delete magic number
+			end();
+		});
+
+		background.add(statistics);
 
 		JButton discordBtn = new JButton() {
 			@Override
@@ -151,12 +190,12 @@ public class Level0 {
 		background.add(discordBtn);
 
 		/**
-		 * //ulozit tlacitko JButton ulozitTlacitko = new JButton() {
+		 * //ulozit button JButton ulozitTlacitko = new JButton() {
 		 * 
 		 * @Override public void paintComponent(Graphics g) { Graphics2D g2d =
 		 * (Graphics2D) g; BufferedImage img = null; try { img = ImageIO.read(new
-		 * File(Okno.ziskatCestu("Level0/save.png"))); } catch (Exception e) {
-		 * System.out.println("CHYBA -- Level0 -- Nacteni obrazku save" + e); }
+		 * File(Okno.getPath("Level0/save.png"))); } catch (Exception e) {
+		 * System.out.println("ERROR -- Level0 -- Nacteni obrazku save" + e); }
 		 * g2d.drawImage(img, 0, 0, getSize().width, getSize().height, null);
 		 * }
 		 * 
@@ -170,6 +209,10 @@ public class Level0 {
 
 	}
 
+	public static void changeConnectionStatus(){
+		checkConnection.setText(" ping-pong " + LocalTime.now());
+	}
+
 	protected void createAccount() {
 		JsonObject jo1 = new JsonObject();
 		jo1.addProperty("Level1", 2147483647);
@@ -179,7 +222,7 @@ public class Level0 {
 		}
 		String jsonString = jo1.toString();
 		try {
-			Files.write(Paths.get(Window.ziskatCestu(NesnupejteDrozdi.accountPath)), jsonString.getBytes(), StandardOpenOption.CREATE);
+			Files.write(Paths.get(Window.getPath(NesnupejteDrozdi.accountPath)), jsonString.getBytes(), StandardOpenOption.CREATE);
 			System.out.println("account {"+NesnupejteDrozdi.account +"} nove zalozen");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -187,51 +230,68 @@ public class Level0 {
 	}
 
 	private void saveTime() {
-		JsonObject jo = new JsonObject();
-		jo.addProperty("Level1", NesnupejteDrozdi.casLevel1);
-		jo.addProperty("Level2", NesnupejteDrozdi.casLevel2);
+		JsonObject jsonObject = new JsonObject();
+		jsonObject.addProperty("Level1", NesnupejteDrozdi.timeLevel1);
+		jsonObject.addProperty("Level2", NesnupejteDrozdi.timeLevel2);
 		for (int i = 0; i < NesnupejteDrozdi.mapTimeList.length; i++) {
-			jo.addProperty("Level3__" + i, NesnupejteDrozdi.mapTimeList[i]);
+			jsonObject.addProperty("Level3__" + i, NesnupejteDrozdi.mapTimeList[i]);
 		}
-		String jsonString = jo.toString();
-
+		String jsonString = jsonObject.toString();
 		try {
-			InputStream inputStream = NesnupejteDrozdi.class.getClassLoader().getResourceAsStream(NesnupejteDrozdi.accountPath);
+			InputStream inputStream = getClass().getClassLoader().getResourceAsStream(NesnupejteDrozdi.accountPath);
+
 			if (inputStream != null) {
-				Files.deleteIfExists(Paths.get(Window.ziskatCestu(NesnupejteDrozdi.accountPath)));
+				Path tempOutputFile = Files.createTempFile("temp", ".json");
+
+				FileWriter fileWriter = new FileWriter(tempOutputFile.toFile());
+				fileWriter.write(jsonString);
+				fileWriter.close();
+
+				Path resourcePathToFile = Paths.get(getClass().getClassLoader().getResource(NesnupejteDrozdi.accountPath).toURI());
+				Files.copy(tempOutputFile, resourcePathToFile, StandardCopyOption.REPLACE_EXISTING);
+				Files.delete(tempOutputFile);
+
+				System.out.println("Saved JSON content to resource file: " + NesnupejteDrozdi.accountPath);
+			} else {
+				System.out.println("Resource not found: " + NesnupejteDrozdi.accountPath);
 			}
-		} catch (IOException e) {
+		} catch (IOException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 
-		try (OutputStream outputStream = Files.newOutputStream(Paths.get(Window.ziskatCestu(NesnupejteDrozdi.accountPath)), StandardOpenOption.CREATE)) {
+		/*try {
+			InputStream inputStream = FileManager.loadJsonInput(NesnupejteDrozdi.accountPath);
+			if (inputStream != null) {
+				Files.deleteIfExists(Paths.get(Window.getPath(NesnupejteDrozdi.accountPath)));
+			}
+			OutputStream outputStream = FileManager.loadJsonOutput(NesnupejteDrozdi.accountPath);//Files.newOutputStream(Paths.get(Window.getPath(NesnupejteDrozdi.accountPath)), StandardOpenOption.CREATE);
 			byte[] jsonStringBytes = jsonString.getBytes();
 			outputStream.write(jsonStringBytes);
 			System.out.println("ulozen account {" + NesnupejteDrozdi.account + "}");
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
+
 	}
 
 	private void updateTimes(JLabel statistic) {
-		JsonObject jo;
+		JsonObject jsonObject;
 		String jsonString = null;
 			try {
-				jsonString = new String(Files.readAllBytes(Paths.get(Window.ziskatCestu(NesnupejteDrozdi.accountPath))));
+				jsonString = new String(Files.readAllBytes(Paths.get(Window.getPath(NesnupejteDrozdi.accountPath))));
 			} catch (IOException e) {
 				e.printStackTrace();
 		}
 		try {
-			jo = new Gson().fromJson(jsonString, JsonObject.class);
-			NesnupejteDrozdi.casLevel1 = jo.get("Level1").getAsLong();
-			NesnupejteDrozdi.casLevel2 = jo.get("Level2").getAsLong();
+			jsonObject = new Gson().fromJson(jsonString, JsonObject.class);
+			NesnupejteDrozdi.timeLevel1 = jsonObject.get("Level1").getAsLong();
+			NesnupejteDrozdi.timeLevel2 = jsonObject.get("Level2").getAsLong();
 			for (int i = 0; i < NesnupejteDrozdi.mapTimeList.length; i++) {
-				NesnupejteDrozdi.mapTimeList[i] = jo.get("Level3__" + i).getAsLong();
+				NesnupejteDrozdi.mapTimeList[i] = jsonObject.get("Level3__" + i).getAsLong();
 			}
 			statistic.repaint();
 		} catch (Exception e) {
 			e.printStackTrace();
-			//System.out.println("nacitani uctu {" + Main.account +"} dokonceno");
 		}
 	}
 
@@ -244,7 +304,7 @@ public class Level0 {
 		return true;
 	}
 
-	private JButton levelBtn3Mapa(Rectangle rect, int map) {
+	private JButton levelBtn3Map(Rectangle rect, int map) {
 		JButton button = new JButton() {
 			@Override
 			public void paintComponent(Graphics g) {
@@ -256,7 +316,7 @@ public class Level0 {
 
 		};
 		button.addActionListener(e -> {
-			NesnupejteDrozdi.progress = 3;
+			NesnupejteDrozdi.setProgress(3);
 			NesnupejteDrozdi.setLevel3Level(map);
 			end();
 		});
@@ -270,7 +330,6 @@ public class Level0 {
 		synchronized (this) {
 			notify();
 		}
-
 	}
 
 	private JButton levelBtn( Rectangle rect, int levelNumber) {
@@ -284,7 +343,7 @@ public class Level0 {
 		};
 
 		button.addActionListener(e -> {
-			NesnupejteDrozdi.progress = levelNumber;
+			NesnupejteDrozdi.setProgress(levelNumber);
 			end();
 		});
 		window.hlPanel.setOpaque(false);
@@ -293,27 +352,64 @@ public class Level0 {
 		return button;
 	}
 
-	private String timeTransform(long cas) {
-		if (cas == 2147483647) {
+	private String timeTransform(long time) {
+		if (time == 2147483647) {
 			return "??????";
 		}
-		String sekundyText = Long.toString((cas % 60000) / 1000);
-		if ((cas % 60000) / 1000 * 60 < 10) {
+		String sekundyText = Long.toString((time % 60000) / 1000);
+		if ((time % 60000) / 1000 * 60 < 10) {
 			sekundyText = "0" + sekundyText;
 		}
-		String milisekundyText = Long.toString((cas % 60000) % 1000);
-		if ((cas % 60000) % 1000 < 10) {
+		String milisekundyText = Long.toString((time % 60000) % 1000);
+		if ((time % 60000) % 1000 < 10) {
 			milisekundyText = "0" + milisekundyText;
 		}
-		return (cas / 60000 + ":" + sekundyText + ":" + milisekundyText);
+		return (time / 60000 + ":" + sekundyText + ":" + milisekundyText);
 	}
 
-	// zkopcena metoda na otvirani
 	public static void openWebpage(String urlString) {
 		try {
 			java.awt.Desktop.getDesktop().browse(new URL(urlString).toURI());
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	static class IntegerDocumentFilter extends DocumentFilter {
+		private static final int MAX_LENGTH = 5; // Maximum allowed length of the text
+
+		@Override
+		public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+			StringBuilder builder = new StringBuilder(string);
+			for (int i = builder.length() - 1; i >= 0; i--) {
+				char ch = builder.charAt(i);
+				if (!Character.isDigit(ch)) {
+					builder.deleteCharAt(i);
+				}
+			}
+
+			if (fb.getDocument().getLength() + builder.length() <= MAX_LENGTH) {
+				super.insertString(fb, offset, builder.toString(), attr);
+			}
+		}
+
+		@Override
+		public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+			if (text == null) {
+				return;
+			}
+
+			StringBuilder builder = new StringBuilder(text);
+			for (int i = builder.length() - 1; i >= 0; i--) {
+				char ch = builder.charAt(i);
+				if (!Character.isDigit(ch)) {
+					builder.deleteCharAt(i);
+				}
+			}
+
+			if (fb.getDocument().getLength() - length + builder.length() <= MAX_LENGTH) {
+				super.replace(fb, offset, length, builder.toString(), attrs);
+			}
 		}
 	}
 

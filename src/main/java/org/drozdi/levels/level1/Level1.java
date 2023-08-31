@@ -4,7 +4,6 @@ import org.drozdi.game.FileManager;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
@@ -17,145 +16,143 @@ import javax.swing.border.LineBorder;
 
 public class Level1 implements ActionListener {
 	ImageIcon drozdi = Window.resizeImage(FileManager.loadImageIcon("drozdi.png"), 200, 200);
-	JButton tlacitko;
-	JLabel tlacitkoLabel;
-	int nasnupano = 0;
-	Window mistniWindow;
-	int stav = 0; // urcuje co maji delat tlacitka pri zmacknuti
-	String a = null;
-	boolean t1open = true;
-	boolean t2open = true;
-	String otazka = "Našel jsi na zemi droždí, co s tím ?";
-	public JButton tlacitko1;
-	public JButton tlacitko2;
-	FileManager_lvl1 filemanager;
+	private int snorted = 0;
+	private int status = 0; // urcuje co maji delat tlacitka pri zmacknuti
+	private String a = null;
+	private boolean t1open = true;
+	private boolean t2open = true;
+	private final Window window;
+	private final JButton button1;
+	private final JButton button2;
+	private FileManager_lvl1 fileManagerLvl1;
+
 public Level1(Window window) {
-		mistniWindow = window;
-		
-		window.smazat();
-		base(window);
-		window.setUpOtazku(window, window.answerPanel, window.otazkyLabel, tlacitko1, tlacitko2, otazka,
-				"Vyhodit droždí do koše", "Vyšňupat droždí");
+	this.window = window;
+	window.setTitle("Šňupejte droždí - Level 1 - PATH TO ADDICTION");
+	window.clean();
+	base(window);
 
-
-		// tlacitka nasteveni chovani
-		tlacitko2.addChangeListener(e -> {
-			JButton b = (JButton) e.getSource();
-			ButtonModel m = b.getModel();
-			boolean isPressedAndArmed = m.isPressed() && m.isArmed();
-			if (t1open) {
-				a = mistniWindow.otazkyLabel.getText();
-			}
-			if (isPressedAndArmed) {
-				if (stav == 0 || stav == 1) {
-					mistniWindow.otazkyLabel.setText("Na tlačítko nešahej a seber to droždí !");
-					if (stav == 0) {
-						stav = 1; // hrac muze klikat na drozdi
-					}
-				}
-				if (stav == 2) {
-					synchronized (this) {
-						mistniWindow.smazat();
-						notify();
-					}
-				}
-				t1open = false;
-			} else {
-				mistniWindow.otazkyLabel.setText(a);
-				t1open = true;
-			}
-		});
-		tlacitko1.addChangeListener(e -> {
-			JButton b = (JButton) e.getSource();
-			ButtonModel m = b.getModel();
-			boolean isPressedAndArmed = m.isPressed() && m.isArmed();
-			if (t2open) {
-				a = mistniWindow.otazkyLabel.getText();
-			}
-			if (isPressedAndArmed) {
-				if (stav == 0 || stav == 1) {
-					mistniWindow.otazkyLabel.setText("Bohužel, koš tu nevidím");
-				}
-				if (stav == 2) {
-					System.out.println(stav + " tl 1");
-					synchronized (this) {
-						notify();
-					}
-				}
-
-				t2open = false;
-			} else {
-				mistniWindow.otazkyLabel.setText(a);
-				t2open = true;
-			}
-		});
-		window.hlPanel.add(tlacitko);
-		// prekresleni (pridani grafick7ch zmen)
-		window.repaint();
-		// cekani dokud nezmackne konecna tlacitko
-		long cas = System.currentTimeMillis(); 
-		synchronized (this) {
-			try {
-				wait();
-			} catch (InterruptedException ex) {
-				System.out.println("CHYBA -- Level1");
-			}
+	button1 = new JButton();
+	button1.addChangeListener(event -> {
+		JButton button = (JButton) event.getSource();
+		ButtonModel buttonModel = button.getModel();
+		boolean isPressedAndArmed = buttonModel.isPressed() && buttonModel.isArmed();
+		if (t2open) {
+			a = window.questionLabel.getText();
 		}
-		//kontrola nejlepsiho casu
-		cas = System.currentTimeMillis() - cas;
-		if (NesnupejteDrozdi.casLevel1 > cas) {
-			NesnupejteDrozdi.casLevel1 = cas;
-		}
-		System.out.println("Level1 čas: " + cas);
-		window.answerPanel.remove(tlacitko1);
-		window.answerPanel.remove(tlacitko2);
-		window.hlPanel.remove(tlacitko);
-		// window.repaint();
+		if (isPressedAndArmed) {
+			if (status == 0 || status == 1) {
+				window.questionLabel.setText("Unfortunately, I dont see any trashcan");
+			}
+			if (status == 2) {
+				System.out.println(status + " tl 1");
+				synchronized (this) {
+					notify();
+				}
+			}
 
-		System.out.println("Level1 -- KONEC");
+			t2open = false;
+		} else {
+			window.questionLabel.setText(a);
+			t2open = true;
+		}
+	});
+	window.hlPanel.add(button1);
+
+	button2 = new JButton();
+	button2.addChangeListener(event -> {
+		JButton button = (JButton) event.getSource();
+		ButtonModel buttonModel = button.getModel();
+		boolean isPressedAndArmed = buttonModel.isPressed() && buttonModel.isArmed();
+		if (t1open) {
+			a = window.questionLabel.getText();
+		}
+		if (isPressedAndArmed) {
+			if (status == 0 || status == 1) {
+				window.questionLabel.setText("Na tlačítko nešahej a seber to droždí !");
+				if (status == 0) {
+					status = 1; // hrac muze klikat na drozdi
+				}
+			}
+			if (status == 2) {
+				synchronized (this) {
+					window.clean();
+					notify();
+				}
+			}
+			t1open = false;
+		} else {
+			window.questionLabel.setText(a);
+			t1open = true;
+		}
+	});
+	window.hlPanel.add(button2);
+
+	String question = "Našel jsi na zemi droždí, co s tím ?";
+	String answer = "Vyhodit droždí do koše";
+	String answer2 = "Vyšňupat droždí";
+	window.setupQuestion(window.answerPanel, window.questionLabel, button1, button2, question, answer, answer2);
+
+	window.repaint();
+
+
+	long time = System.currentTimeMillis();
+	synchronized (this) {
+		try {
+			wait();
+		} catch (InterruptedException ex) {
+			System.out.println("ERROR -- Level1");
+		}
+	}
+
+	time = System.currentTimeMillis() - time;
+	if (NesnupejteDrozdi.timeLevel1 > time) {
+		NesnupejteDrozdi.timeLevel1 = time ;
+	}
+
+	System.out.println("Level1 time: " + time );
+	/**window.answerPanel.remove(button1);
+	window.answerPanel.remove(button2);*/
+
+	System.out.println("Level1 -- END");
 
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// System.out.println("Tlacitko");
-		if (stav != 0) {
-			if (nasnupano >= 100) {
-				mistniWindow.setUpOtazku(mistniWindow, mistniWindow.answerPanel, mistniWindow.otazkyLabel, tlacitko1,
-						tlacitko2, "Našňupáno prostě hodně droždí !! ", "Jít dál", "Jít dál");
-				stav = 2; // aby se zmenily listenery tlacitka na konecnou funkci
-
+		if (status != 0) {
+			if (snorted >= 100) {
+				String question = "Našňupáno prostě hodně droždí !! ";
+				String answer = "Jít dál";
+				window.setupQuestion( window.answerPanel, window.questionLabel, button1, button2, question, answer, answer);
+				status = 2; // aby se zmenily listenery tlacitka na konecnou funkci
 			} else {
-				nasnupano = nasnupano + new Random().nextInt(7);
-				mistniWindow.otazkyLabel.setText("Našňupáno " + nasnupano + "% droždí !!");
+				snorted = snorted + new Random().nextInt(7);
+				window.questionLabel.setText("Našňupáno " + snorted + "% droždí !!");
 			}
 		}
 
 	}
 
 	void base(Window window) {
-		window.defOkno();
-		filemanager = new FileManager_lvl1();
-		tlacitko1 = new JButton();
-		tlacitko2 = new JButton();
-		tlacitko = new JButton();
+		window.defineWindow();
+		fileManagerLvl1 = new FileManager_lvl1();
 
-		window.otazkyLabel.setLayout(null);
-		window.otazkyLabel.setFont(new Font("Consolas", Font.PLAIN, 35));
-		window.otazkyLabel.setForeground(Color.white);
-		window.otazkyLabel.setOpaque(false);
-		window.otazkyLabel.setBorder(new LineBorder(Color.gray, 30));
-		window.otazkyLabel.setVerticalAlignment(JLabel.TOP);
-		
+		window.questionLabel.setLayout(null);
+		window.questionLabel.setFont(new Font("Consolas", Font.PLAIN, 35));
+		window.questionLabel.setForeground(Color.white);
+		window.questionLabel.setOpaque(false);
+		window.questionLabel.setBorder(new LineBorder(Color.gray, 30));
+		window.questionLabel.setVerticalAlignment(JLabel.TOP);
+
 		window.remove(window.hlPanel);
 		
 		window.hlPanel = new JPanel(){
-			
 			@Override
 			public void paintComponent(Graphics g) {
 				Graphics2D g2d = (Graphics2D)g;
 				g2d.fillRect(0,0,100,100);
-				g2d.drawImage(FileManager_lvl1.cesta, 0, 0, getSize().width,getSize().height, null);
+				g2d.drawImage(FileManager_lvl1.path, 0, 0, getSize().width,getSize().height, null);
 			}
 		};
 		window.add(window.hlPanel);
@@ -173,38 +170,43 @@ public Level1(Window window) {
 		window.answerPanel.setVisible(true);
 		window.answerPanel.setOpaque(false);
 
-		// drozdi talcitko
-		tlacitko.setBounds(window.hlPanel.getWidth() / 2 - 100, window.hlPanel.getHeight() / 2 - 100, 200, 200);
-		tlacitko.setIcon(drozdi);
-		tlacitko.addActionListener(this);
-		tlacitko.setOpaque(false);
-		tlacitko.setContentAreaFilled(false);
-		tlacitko.setFocusable(false);
-		tlacitko.setBorder(null);
-		tlacitko.setVisible(true);
-		window.hlPanel.add(tlacitko);
+		JButton drozdiBtn = new JButton();
+		drozdiBtn.setBounds(window.hlPanel.getWidth() / 2 - 100, window.hlPanel.getHeight() / 2 - 100, 200, 200);
+		drozdiBtn.setIcon(drozdi);
+		drozdiBtn.addActionListener(this);
+		drozdiBtn.setOpaque(false);
+		drozdiBtn.setContentAreaFilled(false);
+		drozdiBtn.setFocusable(false);
+		drozdiBtn.setBorder(null);
+		drozdiBtn.setVisible(true);
+		window.hlPanel.add(drozdiBtn);
 		
 		//reklamni panely
-		JLabel reklamniPannel1 =  new JLabel() {
+		JLabel adPanel1;
+		adPanel1 = new JLabel() {
 			@Override
-			public void paintComponent(Graphics g) {
-				Graphics2D g2d = (Graphics2D)g;
-				g2d.drawImage(FileManager_lvl1.reklamnihoBanner, 0, 0, getSize().width,getSize().height, null);
+			public void paintComponent(Graphics graphics) {
+				paintAd(this, graphics);
 			}
 		};
-		reklamniPannel1.setOpaque(false);
-		reklamniPannel1.setBounds(RelativeSize.rectangle(0,0,20,75));
-		window.add(reklamniPannel1);
+		adPanel1.setOpaque(false);
+		adPanel1.setBounds(RelativeSize.rectangle(0,0,20,75));
+		window.add(adPanel1);
 		
-		JLabel reklamniPannel2 =  new JLabel() {
+		JLabel adPanel2 =  new JLabel() {
 			@Override
-			public void paintComponent(Graphics g) {
-				Graphics2D g2d = (Graphics2D)g;
-				g2d.drawImage(FileManager_lvl1.reklamnihoBanner, 0, 0, getSize().width,getSize().height, null);
+			public void paintComponent(Graphics graphics) {
+				paintAd(this, graphics);
 			}
 		};
-		reklamniPannel2.setOpaque(false);
-		reklamniPannel2.setBounds(RelativeSize.rectangle(80,0,20,75));
-		window.add(reklamniPannel2);
+		adPanel2.setOpaque(false);
+		adPanel2.setBounds(RelativeSize.rectangle(80,0,20,75));
+		window.add(adPanel2);
+
+	}
+
+	private void paintAd(JLabel jLabel, Graphics graphics) {
+		Graphics2D g2d = (Graphics2D) graphics;
+		g2d.drawImage(FileManager_lvl1.reklamnihoBanner, 0, 0, jLabel.getWidth(),jLabel.getHeight(), null);
 	}
 }

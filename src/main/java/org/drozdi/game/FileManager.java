@@ -25,4 +25,8 @@ public class FileManager {
             return null;
         }
     }
+    public static URL getResource(String path) {
+        return FileManager.class.getClassLoader().getResource(path);
+    }
+
 }

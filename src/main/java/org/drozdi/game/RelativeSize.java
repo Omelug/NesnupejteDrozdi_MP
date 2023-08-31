@@ -1,7 +1,7 @@
 package org.drozdi.game;
+
 import lombok.Getter;
 import lombok.Setter;
-
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -44,8 +44,8 @@ public class RelativeSize {
 		return new Point(percentageX(percentageX, max), percentageY(percentageY, max));
 	}
 	/**
-	 * @param procentox  kolik procent z maxX ma byt horni levy roh
-	 * @param procentoy  kolik procent z maxY ma byt horni levy roh
+	 * @param percentageX  kolik procent z maxX ma byt horni levy roh
+	 * @param percentageY  kolik procent z maxY ma byt horni levy roh
 	 * @param sizeX  kolik procent z maxX ma byt sirka
 	 * @param sizeY  kolik procent z maxY ma byt vyska
 	 */

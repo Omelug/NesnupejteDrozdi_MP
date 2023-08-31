@@ -5,13 +5,12 @@ import org.drozdi.levels.level3.Panel_level3;
 import org.drozdi.levels.level3.Wall;
 
 public class Ladder extends Wall {
-
-	public Ladder(int x, int y, int sizeX, int sizeY, Panel_level3 panel) {
-		super(x, y, sizeX, sizeY, panel);
+	public Ladder(int x, int y) {
+		super(x, y);
 	}
 
 	@Override
-	public void draw() {
-		drawOnScreen(FileManager_lvl3.ladder);
+	public void draw(Panel_level3 panel) {
+		drawOnScreen(FileManager_lvl3.ladder, panel);
 	}
 }

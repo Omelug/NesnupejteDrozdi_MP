@@ -64,9 +64,9 @@ public class Panel extends JPanel implements Runnable {
 		//window.questionPanel.setBounds(0, window.windowHeight - 150, window.windowWidth, 50);
 		// window.questionPanel.getHeight());
 		window.questionPanel.setBounds(RelativeSize.rectangle(0,85,100,5));
-		window.otazkyLabel.setVerticalTextPosition(JLabel.CENTER);
-		mistniWindow.otazkyLabel.setFont(new Font("Consolas", Font.PLAIN, 25));
-		mistniWindow.otazkyLabel.setText("Nekupuj to droždí! Musíš odolat! ");
+		window.questionLabel.setVerticalTextPosition(JLabel.CENTER);
+		mistniWindow.questionLabel.setFont(new Font("Consolas", Font.PLAIN, 25));
+		mistniWindow.questionLabel.setText("Nekupuj to droždí! Musíš odolat! ");
 
 		window.answerPanel.setBounds(RelativeSize.rectangle(0,90,100,10));
 		window.answerPanel.setBackground(Color.black);
@@ -180,12 +180,12 @@ public class Panel extends JPanel implements Runnable {
 		double intervalCas = (double) 1_000_000_000 / FPS; // prevod jednotek
 		double delta = 0;
 		long minulyCas = System.nanoTime();
-		long cas;
+		long time;
 
 		while (hraThread != null) {
-			cas = System.nanoTime();
-			delta += (cas - minulyCas) / intervalCas;
-			minulyCas = cas;
+			time = System.nanoTime();
+			delta += (time - minulyCas) / intervalCas;
+			minulyCas = time;
 
 			if (delta > 1) {
 				update();
@@ -195,11 +195,11 @@ public class Panel extends JPanel implements Runnable {
 			}
 		}
 		konecnyScreen();
-		System.out.println("KONEC Panelu  " + Thread.currentThread());
+		System.out.println("END Panelu  " + Thread.currentThread());
 	}
 
 	public void konecnyScreen() {
-		mistniWindow.otazkyLabel.setText("Jsi toho nakoupil nějak moc, to nebude jen na vaření...");
+		mistniWindow.questionLabel.setText("Jsi toho nakoupil nějak moc, to nebude jen na vaření...");
 
 		startTlacitko.setText("JÍT Z OBCHODU");
 		startTlacitko.setBackground(Color.cyan);
@@ -214,7 +214,7 @@ public class Panel extends JPanel implements Runnable {
 				if (isPressed) {
 					startTlacitko.setVisible(false);
 					startTlacitko.removeChangeListener(this);
-					System.out.println("KONEC tlacitko  " + Thread.currentThread());
+					System.out.println("END button  " + Thread.currentThread());
 					level2.saveTime();
 					end();
 				}
@@ -225,10 +225,10 @@ public class Panel extends JPanel implements Runnable {
 	public void end() {
 		synchronized (Level2.thread) {
 			try {
-				mistniWindow.smazat();
+				mistniWindow.clean();
 				Level2.thread.notify();
 			} catch (Exception e2) {
-				System.out.println("CHYBA  -- KONEC tlacitko" + Thread.currentThread());
+				System.out.println("ERROR  -- END button" + Thread.currentThread());
 			}
 		}
 	}

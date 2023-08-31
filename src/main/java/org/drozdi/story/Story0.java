@@ -18,14 +18,12 @@ public class Story0 extends JPanel {
 	JButton dal = new JButton();
 
 	// baseni
-	final String quit = "cedulePribehy/quit.png";
-	final String sipka = "cedulePribehy/sipka.png";
+	final String quit = "story/quit.png";
+	final String arrow = "story/arrow.png";
 
 	public Story0(Window window, String text) {
 		this.window = window;
-		
-		//window.smazat();
-		window.defOkno();
+		window.defineWindow();
 		base(text);
 	}
 
@@ -47,14 +45,14 @@ public class Story0 extends JPanel {
 		setUpColor(new Color(80, 80, 80), new Color(36, 137, 176));
 		setUpDownBar();
 		
-		nastavPribeh(text);
-		// baseni nastaveni
+		nastatusStory(text);
+		// baseni nastatuseni
 		if (textLabel.getText() == null)
-			nastavPribeh("Ticho jako po pěšině...");
+			nastatusStory("Ticho jako po pěšině...");
 	}
 
-	public void nastavPribeh(String textPribeh) {
-		textLabel.setText(textPribeh);
+	public void nastatusStory(String textStory) {
+		textLabel.setText(textStory);
 	}
 
 	public void setUpColor(Color color1, Color color2) {
@@ -77,7 +75,7 @@ public class Story0 extends JPanel {
 		window.answerPanel.add(back);
 		
 		dal.setBounds(new Rectangle(RelativeSize.percentageX(88), RelativeSize.percentageY(10,window.answerPanel.getHeight()), RelativeSize.percentageX(10), RelativeSize.percentageY(80,window.answerPanel.getHeight())));
-		dal.setIcon(Window.resizeImage(FileManager.loadImageIcon(sipka),dal.getWidth(), dal.getHeight()));
+		dal.setIcon(Window.resizeImage(FileManager.loadImageIcon(arrow),dal.getWidth(), dal.getHeight()));
 		dal.setOpaque(false);
 		dal.setContentAreaFilled(false);
 		dal.setBorder(null);
@@ -96,12 +94,12 @@ public class Story0 extends JPanel {
 			try {
 				wait();
 			} catch (InterruptedException ex) {
-				System.out.println("CHYBA -- Pribeh  " + ex);
+				System.out.println("ERROR -- Story  " + ex);
 			}
 		}
 		window.hlPanel.remove(textLabel);
 		window.answerPanel.remove(back);
 		window.answerPanel.remove(dal);
-		System.out.println("KONEC -- Pribeh   " + Thread.currentThread());
+		System.out.println("END -- Story   " + Thread.currentThread());
 	}
 }

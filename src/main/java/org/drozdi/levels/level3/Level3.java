@@ -13,56 +13,27 @@ import org.drozdi.levels.level3.walls.Key;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Set;
 
 @Data
 public class Level3 {
-	public static Panel_level3 gamePanel;
 	@Getter @Setter
 	private static Thread thread;
 	private boolean end = true;
-	//private Point2D.Double shift;
-	private ArrayList<Key> savedKeyList;
-	JLabel infoLabel;
-	private int deathCount = 0;
+
+	private static Panel_level3 gamePanel;
+	private Set<Key> savedKeyList;
 	private int keyCount = 0;
-	int map;
-	private long cas;
-	private JFrame window;
+
+	private Window window;
+	private JLabel infoLabel;
+
+	private Object lock = new Object();
+
 	public Level3(Window window) {
 		this.window = window;
-		map = NesnupejteDrozdi.getLevel3Level();
-		window.setTitle("Šňupejte droždí  - Level 3");
-		base(window);
-		new FileManager_lvl3();
 
-		//shift = new Point2D.Double(0, 0);
-		window.repaint();
-		cas = System.currentTimeMillis();
-		do {
-			panelBase(window);
-			thread = Thread.currentThread();
-			synchronized (thread) {
-				try {
-					thread.wait();
-				} catch (InterruptedException ex) {
-					System.out.println("ERROR -- Level3");
-				}
-			}
-			deathCount++;
-			gamePanel.updateInfo();
-		} while (!end);
-		NesnupejteDrozdi.setLevel3Level(map);
-		System.out.println("Level3 -- END " + Thread.currentThread());
-	}
-	public void saveTime() {
-		cas = System.currentTimeMillis() - cas;
-		if (NesnupejteDrozdi.mapTimeList[map] > cas) {
-			NesnupejteDrozdi.mapTimeList[map]= cas;
-		}
-		map++;
-	}
-	private void base(Window window) {
-		window.smazat();
+		window.setTitle("Šňupejte droždí  - Level 3");
 		infoLabel = new JLabel();
 
 		infoLabel.setBounds(RelativeSize.rectangle(0, 0, 100, 10));
@@ -70,23 +41,48 @@ public class Level3 {
 		infoLabel.setVerticalTextPosition(JLabel.CENTER);
 		infoLabel.setFont(new Font("Consolas", Font.PLAIN, 35));
 		infoLabel.setForeground(Color.white);
-		
+
 		window.answerPanel.setLayout(null);
 		window.answerPanel.setBackground(new Color(77,68,68));
 		window.answerPanel.setBounds(RelativeSize.rectangle(0, 85, 100, 15));
 		window.answerPanel.add(infoLabel);
-		
+
 		window.setVisible(true);
 		window.setFocusable(true);
 		window.add(window.answerPanel);
-		
+
+		FileManager_lvl3.loadResources();
+
+		NesnupejteDrozdi.getClient().setPanelLevel3(gamePanel);
+		NesnupejteDrozdi.getClient().getMap();
+		window.repaint();
+
+		do {
+			gamePanel = new Panel_level3(this);
+			window.setFocusable(true);
+			window.requestFocus();
+			window.add(gamePanel);
+			window.addKeyListener(new MoveInput(gamePanel));
+			//thread = Thread.currentThread();
+			synchronized (lock) {
+				try {
+					lock.wait();
+				} catch (InterruptedException ex) {
+					System.out.println("ERROR -- Level3");
+				}
+			}
+		} while (!end);
+
+		System.out.println("Level3 -- END " + Thread.currentThread());
 	}
 
-	void panelBase(Window window) {
-		gamePanel = new Panel_level3(this);
-		window.setFocusable(true);
-		window.requestFocus();
-		window.add(gamePanel);
-		window.addKeyListener(new MoveInput(gamePanel));
-	}
+	/**public void saveTime() {
+		time = System.currentTimeMillis() - time;
+		if (NesnupejteDrozdi.mapTimeList[map] > time) {
+			NesnupejteDrozdi.mapTimeList[map]= time;
+		}
+		map++;
+	}**/
+
+
 }

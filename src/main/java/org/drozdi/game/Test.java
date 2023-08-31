@@ -15,9 +15,9 @@ public class Test {
 	@Getter @Setter
 	private static boolean hitBoxCheckpoint = true;
 	@Getter @Setter
-	private static boolean linesTower = false;
+	private static boolean linesTower = true;
 	@Getter @Setter
-	private static boolean linesSlug = false;
+	private static boolean linesSlug = true;
 	@Getter @Setter
 	private static boolean hitBoxBullets = true;
 	@Getter @Setter

@@ -3,38 +3,42 @@ package org.drozdi.levels.level3.walls;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
-import org.drozdi.levels.level3.player.Player_lvl3;
+
 import org.drozdi.levels.level3.Wall;
+import org.drozdi.levels.level3.client.PlayerMP;
 
 import java.awt.*;
 
 public class Checkpoint extends Wall {
-	public Checkpoint(int x, int y, int sizeX, int sizeY, Panel_level3 panel) {
-		super(x, y, sizeX, sizeY, panel);
+	public Checkpoint(int x, int y) {
+		super(x, (int) (y + 0.92), 1, 0.05);
 	}
 
-	public void setUp() {
-		setHitBox(new Rectangle((int) (getPosition().x - getPanel().getShift().x), getPosition().y - 1, getSize().x, getSize().y + 1));
+	@Override
+	public Rectangle getHitBox(Panel_level3 panel) {
+		return new Rectangle((int) (getPosition().x - panel.getShift().x), getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
+	}
+	@Override
+	public Rectangle getHitBoxServer() {
+		return new Rectangle(getPosition().x, getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
 	}
 
-	public void collisionControl(Player_lvl3 player) {
-		if (player.getHitBox().intersects(getHitBox())) {
-			getPanel().setInfo("Checkpoint pressed");
-			//getPanel().getShift().x = getPanel().getShift().x+ (getHitBox().x - player.getHitBox().x);
-			getPanel().getDefaultPosition().x = getPosition().x / getPanel().getCellSize();
+
+	public void collisionControl(PlayerMP player) {
+		if (player.getHitBoxServer().intersects(getHitBoxServer())) {
+			//TODO getPanel().setInfo("Checkpoint pressed");
+			//getPanel().getDefaultPosition().x = getPosition().x / getPanel().getCellSize();
 			player.setCheckpoint(this);
-			//getPanel().getScreenPosition().y = getPosition().y / getPanel().getCellSize();
 		}
 	}
 
-	public void draw() {
-		drawOnScreen(FileManager_lvl3.checkpoint);
+	public void draw(Panel_level3 panel) {
+		drawOnScreen(FileManager_lvl3.checkpoint, panel);
 
 		if (Test.isHitBoxCheckpoint()) {
-			getPanel().getG2d().setColor(Color.red);
-			getPanel().getG2d().draw(getHitBox());
+			panel.getG2d().setColor(Color.red);
+			panel.getG2d().draw(getHitBox(panel));
 		}
-
 	}
 
 }

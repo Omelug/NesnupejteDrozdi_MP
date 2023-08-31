@@ -1,4 +1,4 @@
-package org.drozdi.levels.level3.player;
+package org.drozdi.levels.level3.client;
 
 public enum Direction {
     UP, DOWN,RIGHT,LEFT
