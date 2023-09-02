@@ -114,8 +114,13 @@ public class GameClient extends Thread {
                                 getPanelLevel3().getPlayer().setPosition(position);
                                 getPanelLevel3().getPlayer().setSize(size);
 
-                                getPanelLevel3().getMapHelper().getPlayerList().add( getPanelLevel3().getPlayer());
+                                getPanelLevel3().getMapHelper().getPlayerList().add(getPanelLevel3().getPlayer());
 
+                                System.out.print("Players {");
+                                for (PlayerMP player : getPanelLevel3().getMapHelper().getPlayerList()) {
+                                    System.out.print("" + player.getName());
+                                }
+                                System.out.print("}");
                                 objectStream.close();
                                 byteStream.close();
 
@@ -150,6 +155,7 @@ public class GameClient extends Thread {
                                 if (player != null){
                                     player.setPosition((Point2D.Double) objectStream.readObject());
                                     player.setDirection((Direction) objectStream.readObject());
+                                    player.setOnGround((boolean) objectStream.readObject());
 
                                     objectStream.close();
                                     byteStream.close();

@@ -31,10 +31,11 @@ public class Packet04Player extends Packet{
                     ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
 
                     objectStream.writeObject(player.isUp());
-                    objectStream.writeObject(player.isLeft());
-                    objectStream.writeObject(player.isDown());
                     objectStream.writeObject(player.isRight());
                     objectStream.writeObject(player.isDown());
+                    objectStream.writeObject(player.isLeft());
+                    objectStream.writeObject(player.isDown());
+                    objectStream.writeObject(player.isShooting());
 
                     objectStream.flush();
                     byte[] data = byteStream.toByteArray();
@@ -64,6 +65,7 @@ public class Packet04Player extends Packet{
                     objectStream.writeObject(player.getName());
                     objectStream.writeObject(player.getPosition());
                     objectStream.writeObject(player.getDirection());
+                    objectStream.writeObject(player.isOnGround());
 
                     objectStream.flush();
                     byte[] data = byteStream.toByteArray();

@@ -1,6 +1,7 @@
 package org.drozdi.levels.level3;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -162,7 +163,7 @@ public class Panel_level3 extends JPanel{
 
 		if (Test.isHitBoxScreen()) {
 			g2d.setColor(Color.red);
-			g2d.draw(screen);
+			drawHitBox(screen);
 		}
 	}
 
@@ -230,6 +231,11 @@ public class Panel_level3 extends JPanel{
 
 	public void drawHitBox(Rectangle hitBox) {
 		Rectangle biggerHitBox = new Rectangle(hitBox.x *cellSize, hitBox.y * cellSize, hitBox.getSize().width * cellSize,hitBox.getSize().height * cellSize);
+		g2d.draw(biggerHitBox);
+	}
+
+	public void drawHitBox(Rectangle2D.Double hitBox) {
+		Rectangle biggerHitBox = new Rectangle((int) (hitBox.x *cellSize), (int) (hitBox.y * cellSize), (int) (hitBox.getWidth() * cellSize), (int) (hitBox.getHeight() * cellSize));
 		g2d.draw(biggerHitBox);
 	}
 }

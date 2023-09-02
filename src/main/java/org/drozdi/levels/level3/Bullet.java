@@ -85,7 +85,7 @@ public class Bullet {
 
 		if (Test.isHitBoxBullets()) {
 			g2d.setColor(Color.green);
-			g2d.draw(getHitBox(panel));
+			panel.drawHitBox(getHitBox(panel));
 		}
 	}
 }

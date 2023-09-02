@@ -27,7 +27,7 @@ public class Slug extends Wall {
 		drawOnScreen(FileManager_lvl3.slug, panel);
 		if (Test.isHitBoxTower()) {
 			panel.getG2d().setColor(Color.green);
-			panel.getG2d().draw(getHitBox(panel));
+			panel.drawHitBox(getHitBox(panel));
 		}
 	}
 

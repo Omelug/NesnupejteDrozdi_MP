@@ -7,6 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 
 public class Window extends JFrame {
@@ -20,12 +22,22 @@ public class Window extends JFrame {
 	public Window() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setUndecorated(GameSettings.delete_title);
-		setExtendedState(JFrame.MAXIMIZED_BOTH);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		int screenWidth = (int) screenSize.getWidth();
-		int screenHeight = (int) screenSize.getHeight();
-		setSize(screenWidth, screenHeight);
-		RelativeSize.setMaximum(screenWidth, screenHeight);
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				// Update the properties after the frame has been resized
+				//TODO
+				windowWidth = getWidth();
+				windowHeight = getHeight();
+				RelativeSize.setMaximum(windowWidth, windowHeight);
+				setVisible(true);
+				repaint();
+				System.out.println("Resized to [" + windowWidth +", "+ windowHeight+"]");
+			}
+		});
+		setVisible(true);
+		setExtendedState(Frame.MAXIMIZED_BOTH);
+		RelativeSize.setMaximum(windowWidth, windowHeight);
 		setTitle("Nešňupejte droždí ");
 		setIconImage(image.getImage());
 		getContentPane().setBackground(Color.cyan);

@@ -1,6 +1,9 @@
 package org.drozdi.levels.level3.client;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Synchronized;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.Bullet;
@@ -23,13 +26,14 @@ import java.util.Timer;
 @Data
 public class PlayerMP {
     private String name;
+    @Getter(onMethod_={@Synchronized("position")}) @Setter(onMethod_={@Synchronized("position")})
     private Point2D.Double position;
     private Point2D.Double size;
     private InetAddress ipAddress;
     private int port;
     private Checkpoint checkpoint;
     private boolean left, right, up, down;
-    private boolean onGround = false;
+    private boolean onGround;
     private int deathCount = 0;
     private Point2D.Double speed = new Point2D.Double(0, 0);
     private Point2D.Double maxSpeed;
@@ -41,7 +45,7 @@ public class PlayerMP {
     public PlayerMP(String name){
         this.name = name;
         position = HitBoxHelper.defaultPosition;
-        size = new Point2D.Double(0.9, 0.9);
+        size = new Point2D.Double(1, 1);
     }
 
     public PlayerMP(String name, InetAddress ipAddress, int port) {
@@ -57,7 +61,7 @@ public class PlayerMP {
 
         if (Test.isHitBoxPlayer()) {
             g2d.setColor(Color.green);
-            g2d.draw(getHitBox(panel));
+            panel.drawHitBox(getHitBox(panel));
         }
 
         if (direction == null){
@@ -92,7 +96,7 @@ public class PlayerMP {
             g2d.drawString((position.x + panel.getShift().x)* panel.getCellSize() + ";"
                     + (position.y + panel.getShift().y)* panel.getCellSize() + "("
                     + panel.getMapHelper().getPlayerShots().size()* panel.getCellSize()
-                    + ")" + "(" + panel.getMapHelper().getEntityShots().size()* panel.getCellSize() + ")\n ",
+                    + ")" + "(" + panel.getMapHelper().getEntityShots().size()* panel.getCellSize() + ") - " + onGround,
                     (int) ((position.x - size.x*2 )* panel.getCellSize()), (int) (position.y* panel.getCellSize()));
 
             draw(g2d, panel);
@@ -102,63 +106,54 @@ public class PlayerMP {
     public Rectangle2D.Double getHitBox(Panel_level3 panel){
         return new Rectangle2D.Double(position.x - panel.getShift().x, position.y, size.x, size.y);
     }
-
+    @Synchronized("position")
     public Rectangle2D.Double getHitBoxServer(){
         return new Rectangle2D.Double(position.x, position.y, size.x, size.y);
     }
-
+    @Synchronized("position")
     public void updatePosition(HitBoxHelper hitBoxHelper) {
         long delta = System.currentTimeMillis() - lastUpdated;
+        double deltaDouble = (double) delta/(double) 10_000;
         lastUpdated = System.currentTimeMillis();
 
         Rectangle2D.Double hitBox = getHitBoxServer();
-
-        double comparison = 50;
+        
+        double speedConst = 100*deltaDouble; //TODO constant of speed
         if (onGround) {
-            maxSpeed = new Point2D.Double(6*comparison, 6*comparison);
+            maxSpeed = new Point2D.Double(10*speedConst, 10*speedConst);
         } else {
-            maxSpeed = new Point2D.Double(4*comparison, 6*comparison);
+            maxSpeed = new Point2D.Double(10*speedConst, 10*speedConst);
         }
 
-        if (left && right || !left && !right)
-            speed.x *= 0.8;
-        else if (left)
-            speed.x = speed.x - comparison;
-        else speed.x = speed.x + comparison;
-
-        if (speed.x < 0.1*comparison && speed.x > -0.1*comparison) {
-            speed.x = 0;
+        if (left && right || !left && !right) {
+            speed.x = speed.x * 0.8; //TODO slowDown constant
+        }
+        if (left){
+            speed.x = -speedConst;
+        }
+        if (right){
+            speed.x = speedConst;
         }
 
-        //speed limit X
+        //gravitation
+        if (!onGround) {
+            speed.y += speedConst/3; //TODO gravitation constant
+        }
+
+        //speed limits
         if (speed.x > maxSpeed.x) {
             speed.x = maxSpeed.x;
         } else if (speed.x < -maxSpeed.x) {
             speed.x = -maxSpeed.x;
         }
-
-        if (up && onGround) {
-            speed.y = -0.7*maxSpeed.y;
-            onGround = false;
+        if (speed.y > maxSpeed.y) {
+            speed.y = maxSpeed.y;
+        } else if (speed.y < -maxSpeed.y) {
+            speed.y = -maxSpeed.y;
         }
-        //gravitation
-        speed.y += comparison;
 
-        speed.x *= (double) delta/10000;
-        hitBox.x += speed.x;
-        for (Wall wall : hitBoxHelper.getMapHelper().getWalls()) {
-            if (hitBox.intersects(wall.getHitBoxServer())) {
-                hitBox.x -= speed.x;
-                while (!wall.getHitBoxServer().intersects(hitBox))
-                    hitBox.x += Math.signum(speed.x);
-                hitBox.x -= Math.signum(speed.x);
-                speed.x = 0;
-            }
-        }
-        position.x = hitBox.x;
-
-        onGround = false;
-        for (Ladder ladder : hitBoxHelper.getMapHelper().getLadders()) {
+        /**
+         for (Ladder ladder : hitBoxHelper.getMapHelper().getLadders()) {
             if (hitBox.intersects(ladder.getHitBoxServer())) {
                 onGround = true;
                 direction = Direction.UP;
@@ -170,23 +165,45 @@ public class PlayerMP {
                     speed.y = 0;
                 }
             }
-        }
+        }*/
 
-        speed.y *= (double) delta/10000;
+       /**if (up && onGround) {
+           speed.y = -maxSpeed.y; //TODO jump constant
+           onGround = false;
+           System.out.println("onGround turned off, " + speed);
+        }
+        */
+        if (speed.x != 0 && speed.x < 0.1*speedConst && speed.x > -0.1*speedConst) {
+            speed.x = 0;
+        }
+        hitBox.x += speed.x;
+
+        for (Wall wall : hitBoxHelper.getMapHelper().getWalls()) {
+            if (hitBox.intersects(wall.getHitBoxServer())) {
+                hitBox.x -= speed.x;
+              while (!wall.getHitBoxServer().intersects(hitBox))
+                    hitBox.x += Math.signum(speed.x);
+                hitBox.x -= Math.signum(speed.x);
+            }
+        }
+        position.x = hitBox.x;
+        /**
         hitBox.y += speed.y;
+        onGround = false;
         for (Wall wall : hitBoxHelper.getMapHelper().getWalls()) {
             if (hitBox.intersects(wall.getHitBoxServer())) {
                 hitBox.y -= speed.y;
-                while (!wall.getHitBoxServer().intersects(hitBox))
-                    hitBox.y += Math.signum(speed.y);
+                while (!wall.getHitBoxServer().intersects(hitBox)){
+                    hitBox.y += Math.signum(speed.y*100);
+                    System.out.println("" +Math.signum(speed.y*100));
+                }
                 hitBox.y -= Math.signum(speed.y);
-                if (speed.y > 0)
-                    onGround = true;
-                speed.y = 0;
+                onGround = true;
+                System.out.println("onGround turned on, " + speed);
             }
         }
         position.y = hitBox.y;
-
+        */
         if (speed.x > 0) {
             direction = Direction.RIGHT;
         }
@@ -195,12 +212,15 @@ public class PlayerMP {
             direction = Direction.LEFT;
         }
 
-        hitBox.x = position.x;
-        hitBox.y = position.y;
-
         if (down) {
             direction = Direction.DOWN;
         }
+        hitBox.x = position.x;
+        hitBox.y = position.y;
+
+        //System.out.println("Speed: " + speed.x + "," + speed.y);
+
+        //TODO System.out.println("Player - speed: " + speed + ", "+ onGround);
         /**
         for (Hedgehog hedgehog : hitBoxHelper.getMapHelper().getHedgehogs()) {
             hedgehog.collisionControl(this);

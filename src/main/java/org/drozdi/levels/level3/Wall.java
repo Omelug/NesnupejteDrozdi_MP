@@ -3,6 +3,7 @@ package org.drozdi.levels.level3;
 import lombok.Data;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 @Data
 public class Wall {
@@ -22,12 +23,14 @@ public class Wall {
 		return new Rectangle((int) (position.x - panel.getShift().x), position.y, (int) size.x, (int) size.y);
 	}
 
-	public Rectangle getHitBoxServer() {
-		return new Rectangle( position.x , position.y, (int) size.x, (int) size.y);
+	public Rectangle2D.Double getHitBoxServer() {
+		return new Rectangle2D.Double( position.x , position.y, size.x, size.y);
 	}
 
 	public void draw(Panel_level3 panel) {
 		drawOnScreen(FileManager_lvl3.wall, panel);
+		panel.getG2d().setColor(Color.yellow);
+		panel.drawHitBox(getHitBox(panel));
 	}
 	public void draw(Image image, Panel_level3 panel) {
 		drawOnScreen(image, panel);

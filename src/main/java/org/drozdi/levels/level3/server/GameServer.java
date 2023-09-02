@@ -128,7 +128,7 @@ public class GameServer extends Thread{
 
                             System.out.print("Players {");
                             for (PlayerMP player : getHitBoxHelper().getMapHelper().getPlayerList()) {
-                                System.out.print("" + player.getName());
+                                System.out.print("" + player.getName() + " [" +player.getPosition().x + "," + player.getPosition().y +"]");
                             }
                             System.out.print("}");
                            }
@@ -165,12 +165,14 @@ public class GameServer extends Thread{
                                 PlayerMP player = hitBoxHelper.getPlayerByIpAndPort(packet.getAddress(),packet.getPort());
 
                                 if (player == null){
-                                    break;
+                                      break;
                                 }
                                 player.setUp((boolean) objectStream.readObject());
+                                player.setRight((boolean) objectStream.readObject());
+                                player.setDown((boolean) objectStream.readObject());
                                 player.setLeft((boolean) objectStream.readObject());
                                 player.setDown((boolean) objectStream.readObject());
-                                player.setRight((boolean) objectStream.readObject());
+                                player.setShooting((boolean) objectStream.readObject());
 
                                 objectStream.close();
                                 byteStream.close();

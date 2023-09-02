@@ -8,6 +8,7 @@ import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Checkpoint extends Wall {
 	public Checkpoint(int x, int y) {
@@ -19,8 +20,8 @@ public class Checkpoint extends Wall {
 		return new Rectangle((int) (getPosition().x - panel.getShift().x), getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
 	}
 	@Override
-	public Rectangle getHitBoxServer() {
-		return new Rectangle(getPosition().x, getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
+	public Rectangle2D.Double getHitBoxServer() {
+		return new Rectangle2D.Double (getPosition().x, getPosition().y - 1, getSize().x, (getSize().y + 1));
 	}
 
 
@@ -37,7 +38,7 @@ public class Checkpoint extends Wall {
 
 		if (Test.isHitBoxCheckpoint()) {
 			panel.getG2d().setColor(Color.red);
-			panel.getG2d().draw(getHitBox(panel));
+			panel.drawHitBox(getHitBox(panel));
 		}
 	}
 

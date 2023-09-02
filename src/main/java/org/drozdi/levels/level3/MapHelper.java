@@ -6,12 +6,12 @@ import lombok.Setter;
 import lombok.Synchronized;
 import org.drozdi.game.FileManager;
 import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.HitBoxHelper;
 import org.drozdi.levels.level3.walls.*;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -104,6 +104,8 @@ public class MapHelper {
         }
         if (!found){
             playerList.add(playerMP);
+        }else{
+            playerMP.setPosition(HitBoxHelper.defaultPosition);
         }
     }
 }
