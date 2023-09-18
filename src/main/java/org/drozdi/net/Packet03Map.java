@@ -6,6 +6,7 @@ import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.server.GameServer;
 
 import java.net.InetAddress;
+import java.net.Socket;
 
 public class Packet03Map extends Packet{
 
@@ -17,33 +18,35 @@ public class Packet03Map extends Packet{
         this.mapPacketType = mapPacketType;
     }
 
-    @Override
-    public void writeData(GameClient client) {
+    public void writeDataTCP(GameClient client) {
         switch (mapPacketType) {
             case START -> {
-                client.sendData(buildPacket("".getBytes()));
+                client.sendDataTCP(buildPacket("".getBytes()));
             }
         }
     }
 
     @Override
-    public void writeData(GameServer server, InetAddress clientAddress, int clientPort) {
+    public void writeDataUDP(GameClient client) {}
+
+    @Override
+    public void writeData(GameServer server, InetAddress clientAddress, int clientPort) {}
+
+    @Override
+    public void writeDataTCP(GameServer server,Socket clientSocket) {
         switch (mapPacketType) {
             case START -> {
-                server.sendData(buildPacket(null), clientAddress, clientPort);
+                server.sendDataTCP(buildPacket(null), clientSocket);
             }
             default -> {
                 System.out.println("INVALID mapPacketType");
             }
         }
     }
-    public void writeData(GameServer server, InetAddress clientAddress, int clientPort, byte[] data) {
+    public void writeDataTCP(GameServer server,Socket clientSocket, byte[] data) {
         switch (mapPacketType) {
             case DATA -> {
-                server.sendData(buildPacket(data), clientAddress, clientPort);
-            }
-            default -> {
-                System.out.println("INVALID mapPacketType");
+                server.sendDataTCP(buildPacket(data), clientSocket);
             }
         }
     }

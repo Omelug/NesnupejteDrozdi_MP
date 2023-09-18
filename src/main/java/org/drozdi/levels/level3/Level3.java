@@ -1,18 +1,15 @@
 package org.drozdi.levels.level3;
 
-import javax.swing.*;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.drozdi.game.NesnupejteDrozdi;
-import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
+import org.drozdi.game.Window;
 import org.drozdi.levels.level3.walls.Key;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.*;
 import java.util.Set;
 
 @Data
@@ -54,7 +51,7 @@ public class Level3 {
 		FileManager_lvl3.loadResources();
 
 		NesnupejteDrozdi.getClient().setPanelLevel3(gamePanel);
-		NesnupejteDrozdi.getClient().getMap();
+		NesnupejteDrozdi.getClient().getMap(); //TODO pockat na
 		window.repaint();
 
 		do {

@@ -1,15 +1,5 @@
 package org.drozdi.levels.level3;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import javax.swing.JPanel;
-import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.Point;
-import java.awt.Color;
 import lombok.Data;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.RelativeSize;
@@ -17,6 +7,19 @@ import org.drozdi.game.Test;
 import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.walls.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 @Data
 public class Panel_level3 extends JPanel{
@@ -34,13 +37,12 @@ public class Panel_level3 extends JPanel{
 	private Level3 level3;
 	private Graphics2D g2d;
 	private Set<Wall> wallsOnScreen = new HashSet<>();
-
 	private MapHelper mapHelper = new MapHelper();
-
+	private GameClient client;
 
 	public Panel_level3(Level3 level3) {
 		this.level3 = level3;
-		GameClient client = NesnupejteDrozdi.getClient();
+		client = NesnupejteDrozdi.getClient();
 		client.setPanelLevel3(this);
 
 		screenPosition = new Point(13, 10);
@@ -55,7 +57,6 @@ public class Panel_level3 extends JPanel{
 		updateInfo();
 		shift = new Point2D.Double(0, 0);
 		screen = new Rectangle(0, 0, getWidth(), getHeight());
-		//System.out.println("Panel {" + getWidth() +";"+ getHeight()+"}");
 		mapHelper.loadMap();
 		level3.setEnd(true);
 
@@ -97,7 +98,7 @@ public class Panel_level3 extends JPanel{
 		lastUpdateTime = currentTime;
 		fps = 1.0 / elapsedTime;
 
-		level3.getWindow().setTitle("FPS: " + String.format("%.2f", fps) +", Walls: "+wallsOnScreen.size() +"/"+mapHelper.getWalls().size()+", Towers: "+ mapHelper.getTowers().size()+", Player: "+ player.getPosition());
+		level3.getWindow().setTitle("FPS: " + String.format("%.2f", fps) +", Walls: "+wallsOnScreen.size() +"/"+mapHelper.getWalls().size()+", Towers: "+ mapHelper.getTowers().size()+", " + player.getName() +": "+ player.getPosition()+", Shift: "+ getShift());
 	}
 
 	public void updateInfo() {
@@ -108,6 +109,7 @@ public class Panel_level3 extends JPanel{
 	public void paint(Graphics graphics) {
 		super.paint(graphics);
 		g2d = (Graphics2D) graphics;
+		updateClientShift();
 
 		for (Wall wall : wallsOnScreen) {
 			wall.draw(this);
@@ -181,6 +183,7 @@ public class Panel_level3 extends JPanel{
 	}
 
 	public void end() {
+		client.disconnect();
 		updateInfo();
 		//TODO send disconnect server
 		synchronized (level3.getLock()) {
@@ -218,15 +221,10 @@ public class Panel_level3 extends JPanel{
 		NesnupejteDrozdi.getClient().move();
 	}
 
-	public void setShift(Point newShift) {
-		Point2D.Double point = new Point2D.Double();
-		point.x = newShift.x;
-		point.y = newShift.y;
-		setShift(point);
-	}
-
-	public void setShift(Point2D.Double shift) {
-		this.shift = shift;
+	public void updateClientShift() {
+		//shift.x = getPlayer().getPosition().x - HitBoxHelper.defaultPosition.x;
+		//shift.y = getPlayer().getPosition().y - HitBoxHelper.defaultPosition.y;
+		//TODO update shift podle pozice
 	}
 
 	public void drawHitBox(Rectangle hitBox) {

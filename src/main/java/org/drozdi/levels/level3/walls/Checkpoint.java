@@ -3,7 +3,6 @@ package org.drozdi.levels.level3.walls;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
-
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 

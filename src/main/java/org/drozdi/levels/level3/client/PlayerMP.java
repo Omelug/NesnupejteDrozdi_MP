@@ -12,16 +12,12 @@ import org.drozdi.levels.level3.Panel_level3;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.server.HitBoxHelper;
 import org.drozdi.levels.level3.walls.Checkpoint;
-import org.drozdi.levels.level3.walls.Door;
-import org.drozdi.levels.level3.walls.Hedgehog;
-import org.drozdi.levels.level3.walls.Ladder;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.InetAddress;
-import java.util.Timer;
 
 @Data
 public class PlayerMP {
@@ -50,7 +46,6 @@ public class PlayerMP {
 
     public PlayerMP(String name, InetAddress ipAddress, int port) {
         this(name);
-        System.out.println("Connected user:" +  name);
         this.ipAddress = ipAddress;
         this.port = port;
         position = HitBoxHelper.defaultPosition;
@@ -78,11 +73,6 @@ public class PlayerMP {
 
     private void drawPlayer(Graphics2D g2d, BufferedImage image, Panel_level3 panel) {
         Rectangle2D.Double hitBox = getHitBox(panel);
-        /*int radius = 40;
-        g2d.setColor(Color.RED);
-        /*g2d.drawOval((int) (hitBox.x* panel.getCellSize() - radius),
-                (int) (hitBox.y* panel.getCellSize() - radius),
-                2 * radius, 2 * radius);*/
         g2d.drawImage( image, (int) (hitBox.x * panel.getCellSize()), (int) (hitBox.y  * panel.getCellSize()), (int) (size.x * panel.getCellSize()), (int) (size.y* panel.getCellSize()), null);
     }
 
@@ -91,10 +81,10 @@ public class PlayerMP {
         if (panel.getScreen().intersects(getHitBox(panel))) {
             g2d.setColor(Color.cyan);
             FontMetrics fontMetrics = g2d.getFontMetrics();
-            int x = (int) (position.x + size.x /2 -(fontMetrics.stringWidth(NesnupejteDrozdi.account)) / 2)* panel.getCellSize();
-            g2d.drawString(NesnupejteDrozdi.account, x, (int) (position.y -10));
-            g2d.drawString((position.x + panel.getShift().x)* panel.getCellSize() + ";"
-                    + (position.y + panel.getShift().y)* panel.getCellSize() + "("
+            int x = (int) (position.x + size.x /2 -(fontMetrics.stringWidth(name)) / 2)* panel.getCellSize();
+            g2d.drawString(name, x, (int) (position.y -10));
+            g2d.drawString((position.x - panel.getShift().x)* panel.getCellSize() + ";"
+                    + (position.y - panel.getShift().y)* panel.getCellSize() + "("
                     + panel.getMapHelper().getPlayerShots().size()* panel.getCellSize()
                     + ")" + "(" + panel.getMapHelper().getEntityShots().size()* panel.getCellSize() + ") - " + onGround,
                     (int) ((position.x - size.x*2 )* panel.getCellSize()), (int) (position.y* panel.getCellSize()));
@@ -113,12 +103,12 @@ public class PlayerMP {
     @Synchronized("position")
     public void updatePosition(HitBoxHelper hitBoxHelper) {
         long delta = System.currentTimeMillis() - lastUpdated;
-        double deltaDouble = (double) delta/(double) 10_000;
+        double deltaDouble = (double) delta/10e3;
         lastUpdated = System.currentTimeMillis();
 
         Rectangle2D.Double hitBox = getHitBoxServer();
         
-        double speedConst = 100*deltaDouble; //TODO constant of speed
+        double speedConst = 50*deltaDouble; //TODO constant of speed
         if (onGround) {
             maxSpeed = new Point2D.Double(10*speedConst, 10*speedConst);
         } else {
@@ -167,12 +157,12 @@ public class PlayerMP {
             }
         }*/
 
-       /**if (up && onGround) {
-           speed.y = -maxSpeed.y; //TODO jump constant
+       if (up && onGround) {
+           speed.y = -0.3*maxSpeed.y; //TODO jump constant
            onGround = false;
-           System.out.println("onGround turned off, " + speed);
+           //System.out.println("onGround turned off, " + speed);
         }
-        */
+
         if (speed.x != 0 && speed.x < 0.1*speedConst && speed.x > -0.1*speedConst) {
             speed.x = 0;
         }
@@ -182,28 +172,32 @@ public class PlayerMP {
             if (hitBox.intersects(wall.getHitBoxServer())) {
                 hitBox.x -= speed.x;
               while (!wall.getHitBoxServer().intersects(hitBox))
-                    hitBox.x += Math.signum(speed.x);
-                hitBox.x -= Math.signum(speed.x);
+                    hitBox.x += 0.01*Math.signum(speed.x);
+                hitBox.x -= 0.01*Math.signum(speed.x);
             }
         }
         position.x = hitBox.x;
-        /**
+
         hitBox.y += speed.y;
         onGround = false;
         for (Wall wall : hitBoxHelper.getMapHelper().getWalls()) {
             if (hitBox.intersects(wall.getHitBoxServer())) {
                 hitBox.y -= speed.y;
                 while (!wall.getHitBoxServer().intersects(hitBox)){
-                    hitBox.y += Math.signum(speed.y*100);
-                    System.out.println("" +Math.signum(speed.y*100));
+                    hitBox.y += 0.01*Math.signum(speed.y*100);
+                    //System.out.println("" +Math.signum(speed.y*100));
                 }
-                hitBox.y -= Math.signum(speed.y);
-                onGround = true;
-                System.out.println("onGround turned on, " + speed);
+                hitBox.y -= 0.01*Math.signum(speed.y);
+                if (hitBox.y < wall.getHitBoxServer().y) {
+                    onGround = true;
+                }else{
+                    speed.y = 0;
+                }
+                //System.out.println("onGround turned on, " + speed);
             }
         }
         position.y = hitBox.y;
-        */
+
         if (speed.x > 0) {
             direction = Direction.RIGHT;
         }
@@ -232,11 +226,6 @@ public class PlayerMP {
             door.collisionControl(this);
         }**/
     }
-    public void updateClientShift(Panel_level3 panel) {
-        //panel.getShift().x += speed.x;
-        //panel.getShift().y += speed.y;
-        //TODO update shift podle pozice
-    }
 
     public synchronized void shot(HitBoxHelper hitBoxHelper) {
         shot++;
@@ -249,5 +238,31 @@ public class PlayerMP {
     public void dead() {
         deathCount++;
         //TODO dead
+    }
+
+    public String toStringServer() {
+        return name + "{"+ipAddress+":"+port +", position["+position.x+";"+ position.y +"], "+getMove()+"}";
+    }
+
+    private String getMove() {
+        String result = "";
+        if (up){
+            result += 'w';
+        }
+        if (left){
+            result += 'a';
+        }
+        if (down){
+            result += 's';
+        }
+        if (right){
+            result += 'd';
+        }
+        result += '_';
+
+        if (shooting){
+            result += 'S';
+        }
+        return result;
     }
 }

@@ -3,10 +3,8 @@ package org.drozdi.levels.level2;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Window;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import java.awt.Color;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 
 public class Level2 {
 	ImageIcon drozdi = Window.resizeImage(new ImageIcon("rsc/drozdi.png"), 200, 200);

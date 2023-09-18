@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 
 public class Packet04Player extends Packet{
 
@@ -22,7 +23,15 @@ public class Packet04Player extends Packet{
     }
 
     @Override
-    public void writeData(GameClient client) {
+    public void writeDataTCP(GameServer server, Socket clientSocket) {
+    }
+
+    @Override
+    public void writeDataTCP(GameClient client) {
+    }
+
+    @Override
+    public void writeDataUDP(GameClient client) {
         switch (playerPacketType) {
             case MOVE -> {
                 PlayerMP player = client.getPanelLevel3().getPlayer();
@@ -42,7 +51,7 @@ public class Packet04Player extends Packet{
 
                     objectStream.close();
                     byteStream.close();
-                    client.sendData(buildPacket(data));
+                    client.sendDataUDP(buildPacket(data));
 
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -57,7 +66,7 @@ public class Packet04Player extends Packet{
 
     public void writeData(GameServer server, InetAddress clientAddress, int clientPort, PlayerMP player) {
         switch (playerPacketType) {
-            case NEXT_PLAYER -> {
+            case NEXT_PLAYER, MOVE -> {
                 try {
                     ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
                     ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
@@ -69,7 +78,7 @@ public class Packet04Player extends Packet{
 
                     objectStream.flush();
                     byte[] data = byteStream.toByteArray();
-                    server.sendData(buildPacket(data), clientAddress, clientPort);
+                    server.sendDataUDP(buildPacket(data), clientAddress, clientPort);
 
                     objectStream.close();
                     byteStream.close();
@@ -83,7 +92,12 @@ public class Packet04Player extends Packet{
 
     public void writeAllClients(GameServer server, PlayerMP player) {
         for (PlayerMP playerMP : server.getHitBoxHelper().getMapHelper().getPlayerList()){
-           writeData(server, playerMP.getIpAddress(), playerMP.getPort(), player);
+            if (player.getIpAddress().equals(playerMP.getIpAddress()) && player.getPort() == playerMP.getPort()) {
+                playerPacketType = PlayerPacketType.MOVE;
+            }else{
+                playerPacketType = PlayerPacketType.NEXT_PLAYER;
+            }
+            writeData(server, playerMP.getIpAddress(), playerMP.getPort(), player);
         }
     }
 
@@ -97,10 +111,6 @@ public class Packet04Player extends Packet{
         System.arraycopy(data, 0, packetData, headerBytes.length, data.length);
 
         return packetData;
-    }
-
-    public void writeData(GameServer gameServer, InetAddress ipAddress, int port, byte[] data) {
-        gameServer.sendData(buildPacket(data), ipAddress, port);
     }
 
     public enum PlayerPacketType {
@@ -119,7 +129,7 @@ public class Packet04Player extends Packet{
 
     }
 
-    public static PlayerPacketType lookupMapPacket(int id){
+    public static PlayerPacketType lookupPlayerPacket(int id){
         for (PlayerPacketType playerPacketType : PlayerPacketType.values()) {
             if (playerPacketType.getPlayerPacketType() == id){
                 return playerPacketType;

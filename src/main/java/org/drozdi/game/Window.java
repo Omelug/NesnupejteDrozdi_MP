@@ -1,12 +1,7 @@
 package org.drozdi.game;
 
+import javax.swing.*;
 import java.awt.*;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
@@ -20,7 +15,7 @@ public class Window extends JFrame {
 	
 	ImageIcon image = FileManager.loadImageIcon("drozdi.png");
 	public Window() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setUndecorated(GameSettings.delete_title);
 		addComponentListener(new ComponentAdapter() {
 			@Override

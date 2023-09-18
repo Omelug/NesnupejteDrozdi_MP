@@ -1,6 +1,7 @@
 package org.drozdi.levels.level1;
 
 import org.drozdi.game.FileManager;
+
 import java.awt.image.BufferedImage;
 
 public class FileManager_lvl1 {

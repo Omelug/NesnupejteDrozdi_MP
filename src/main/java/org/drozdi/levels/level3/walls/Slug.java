@@ -1,13 +1,14 @@
 package org.drozdi.levels.level3.walls;
 
 import org.drozdi.game.Test;
-import org.drozdi.levels.level3.*;
+import org.drozdi.levels.level3.Bullet;
+import org.drozdi.levels.level3.FileManager_lvl3;
+import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.HitBoxHelper;
 
-
-import java.awt.Color;
-import java.awt.Rectangle;
+import java.awt.*;
 
 public class Slug extends Wall {
 	public static final double MAX_DISTANCE = 200; //TODO control

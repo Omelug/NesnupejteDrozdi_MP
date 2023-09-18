@@ -1,12 +1,11 @@
 package org.drozdi.levels.level3.server;
 
 import lombok.Data;
-import org.drozdi.levels.level3.Bullet;
-import org.drozdi.levels.level3.BulletType;
 import org.drozdi.levels.level3.MapHelper;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
-import org.drozdi.levels.level3.walls.*;
+import org.drozdi.levels.level3.walls.Slug;
+import org.drozdi.levels.level3.walls.Tower;
 import org.drozdi.net.Packet04Player;
 
 import java.awt.*;

@@ -2,17 +2,15 @@ package org.drozdi.levels.level1;
 
 import org.drozdi.game.FileManager;
 import org.drozdi.game.NesnupejteDrozdi;
-import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.event.*;
-import java.util.Random;
+import org.drozdi.game.Window;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
 
 public class Level1 implements ActionListener {
 	ImageIcon drozdi = Window.resizeImage(FileManager.loadImageIcon("drozdi.png"), 200, 200);

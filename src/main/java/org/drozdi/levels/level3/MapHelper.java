@@ -6,12 +6,15 @@ import lombok.Setter;
 import lombok.Synchronized;
 import org.drozdi.game.FileManager;
 import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.GameServer;
 import org.drozdi.levels.level3.server.HitBoxHelper;
 import org.drozdi.levels.level3.walls.*;
 
 import java.awt.image.BufferedImage;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @Data
@@ -30,9 +33,10 @@ public class MapHelper {
     private Set<Door> doors = new HashSet<>();
     private ArrayList<Key> keys = new ArrayList<>();
 
+    //TODO offline game
     @Synchronized
     private void loadMap(int mapNumber) {
-        BufferedImage map = FileManager.loadResource("Level3/maps/map" + mapNumber + ".bmp"); //TODO offline game
+        BufferedImage map = FileManager.loadResource("Level3/maps/map" + mapNumber + ".bmp");
         loadMap(map);
     }
     public void loadMap() {
@@ -104,8 +108,26 @@ public class MapHelper {
         }
         if (!found){
             playerList.add(playerMP);
-        }else{
-            playerMP.setPosition(HitBoxHelper.defaultPosition);
+        }
+    }
+
+    public boolean playerConnected(HitBoxHelper hitBoxHelper, InetAddress address, int port) {
+        PlayerMP player = hitBoxHelper.getPlayerByIpAndPort(address, port);
+        if (player != null) {
+            System.out.println("Player " + player.getName() + " is connected");
+            return true;
+        }
+        return false;
+    }
+
+    public void removePlayer(InetAddress address, int port) {
+        Iterator<PlayerMP> iterator = playerList.iterator();
+        while (iterator.hasNext()) {
+            PlayerMP player = iterator.next();
+            if (player.getIpAddress().equals(address) && player.getPort() == port) {
+                GameServer.getLogger().playerDisconnect(player);
+                iterator.remove();
+            }
         }
     }
 }

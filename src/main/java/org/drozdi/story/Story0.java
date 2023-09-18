@@ -2,14 +2,11 @@ package org.drozdi.story;
 
 import org.drozdi.game.FileManager;
 import org.drozdi.game.NesnupejteDrozdi;
-import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
-import java.awt.Color;
-import java.awt.Font;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import java.awt.Rectangle;
+import org.drozdi.game.Window;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class Story0 extends JPanel {
 	JLabel textLabel = new JLabel();

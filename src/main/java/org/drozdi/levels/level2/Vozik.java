@@ -2,7 +2,7 @@ package org.drozdi.levels.level2;
 
 import org.drozdi.game.Window;
 
-import javax.swing.ImageIcon;
+import javax.swing.*;
 
 public class Vozik {
 	public int misto;

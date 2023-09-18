@@ -1,18 +1,12 @@
 package org.drozdi.levels.level2;
 
-import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
+import org.drozdi.game.Window;
 
-import java.awt.*;
-
-import javax.swing.ButtonModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 

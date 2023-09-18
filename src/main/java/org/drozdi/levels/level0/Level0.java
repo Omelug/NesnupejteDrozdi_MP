@@ -1,9 +1,11 @@
 package org.drozdi.levels.level0;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.drozdi.game.FileManager;
 import org.drozdi.game.NesnupejteDrozdi;
-import org.drozdi.game.Window;
 import org.drozdi.game.RelativeSize;
+import org.drozdi.game.Window;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -12,14 +14,16 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.*;
 import java.time.LocalTime;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import org.drozdi.levels.level3.Level3;
 
 import static java.lang.Thread.currentThread;
 
@@ -51,13 +55,14 @@ public class Level0 {
 		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 
+		//TODO testvaci;
+
 		synchronized (this) {
 			try {
 				wait();
 			} catch (InterruptedException ex) {
 				System.out.println("ERROR -- Level0");
 			}
-
 		}
 		window.clean();
 		System.out.println("END Level0");
@@ -111,13 +116,13 @@ public class Level0 {
 		newAccount.setBounds(RelativeSize.percentageX(10, statistics.getWidth()), 50, RelativeSize.percentageX(60, statistics.getWidth()), 20);
 		statistics.add(newAccount);
 		newAccount.addActionListener(e -> {
-			saveTime();
+			///TODO saveTime();
 			NesnupejteDrozdi.account = newAccount.getText();
 
 			File fileCheck = new File(Window.getPath(NesnupejteDrozdi.accountPath));
 			if (!(fileCheck.exists() && !fileCheck.isDirectory())) {
 				if (isValid(newAccount.getText()) && !newAccount.getText().isEmpty()) {
-					createAccount();
+					//TODO createAccount();
 				}else {
 					NesnupejteDrozdi.account = "NeplatnyZnaky";
 				}
@@ -131,7 +136,7 @@ public class Level0 {
 		});
 
 		JTextField newIpAddress = new JTextField();
-		newIpAddress.setBounds(RelativeSize.percentageX(5, statistics.getWidth()), 320, RelativeSize.percentageX(50, statistics.getWidth()), 20);
+		newIpAddress.setBounds(RelativeSize.percentageX(5, statistics.getWidth()), 300, RelativeSize.percentageX(50, statistics.getWidth()), 20);
 		statistics.add(newIpAddress);
 		newIpAddress.setText(String.valueOf(NesnupejteDrozdi.getClient().getIpAddress()));
 		newIpAddress.addActionListener(e -> {
@@ -142,13 +147,22 @@ public class Level0 {
 			}
 		});
 
-		JTextField newPort = new JTextField();
-		newPort.setBounds(RelativeSize.percentageX(55, statistics.getWidth()), 320,RelativeSize.percentageX(20, statistics.getWidth()), 20);
-		statistics.add(newPort);
-		newPort.setText(String.valueOf(NesnupejteDrozdi.getClient().getPort()));
-		((AbstractDocument) newPort.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
-		newPort.addActionListener(e -> {
-			NesnupejteDrozdi.getClient().setPort(Integer.parseInt(newPort.getText()));
+		JTextField newUDPPort = new JTextField();
+		newUDPPort.setBounds(RelativeSize.percentageX(55, statistics.getWidth()), 300,RelativeSize.percentageX(20, statistics.getWidth()), 20);
+		statistics.add(newUDPPort);
+		newUDPPort.setText(String.valueOf(NesnupejteDrozdi.getClient().getPortUDP()));
+		((AbstractDocument) newUDPPort.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
+		newUDPPort.addActionListener(e -> {
+			NesnupejteDrozdi.getClient().setPortUDP(Integer.parseInt(newUDPPort.getText()));
+		});
+
+		JTextField newTCPPort = new JTextField();
+		newTCPPort.setBounds(RelativeSize.percentageX(55, statistics.getWidth()), 320,RelativeSize.percentageX(20, statistics.getWidth()), 20);
+		statistics.add(newTCPPort);
+		newTCPPort.setText(String.valueOf(NesnupejteDrozdi.getClient().getPortTCP()));
+		((AbstractDocument) newTCPPort.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
+		newTCPPort.addActionListener(e -> {
+			NesnupejteDrozdi.getClient().setPortTCP(Integer.parseInt(newTCPPort.getText()));
 		});
 
 		checkConnection = new JButton();

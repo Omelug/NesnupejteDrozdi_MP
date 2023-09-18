@@ -1,8 +1,9 @@
 package org.drozdi.levels.level3;
 
 import org.drozdi.game.FileManager;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.Point;
 
 public class FileManager_lvl3 {
 	public static BufferedImage playerRight, playerLeft, playerUp, playerDown;

@@ -2,15 +2,15 @@ package org.drozdi.net;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.GameServer;
-import org.drozdi.levels.level3.client.GameClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
-import java.util.Set;
+import java.net.Socket;
 
 public class Packet01Login extends Packet {
 
@@ -23,18 +23,30 @@ public class Packet01Login extends Packet {
     }
 
     @Override
-    public void writeData(GameClient client) {
+    public void writeDataTCP(GameServer server, Socket clientSocket) {
+
+    }
+
+    @Override
+    public void writeDataTCP(GameClient client) {
         switch (loginPacketType) {
-            case CONNECT -> {
-                client.sendData(buildPacket(client.getPanelLevel3().getPlayer().getName().getBytes()));
+            case CONNECT, DISCONNECT -> {
+                client.sendDataTCP(
+                        buildPacket(
+                                client.getPanelLevel3().getPlayer().getName().getBytes()
+                        ));
             }
         }
     }
+
+    @Override
+    public void writeDataUDP(GameClient client) {}
+
     @Override
     public void writeData(GameServer server, InetAddress clientAddress, int clientPort) {
     }
 
-    public void sendToPlayer(GameServer server, PlayerMP player) {
+    public void sendToPlayer(GameServer server, PlayerMP player, Socket clientSocket) {
         try {
             ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
             ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
@@ -48,7 +60,7 @@ public class Packet01Login extends Packet {
             objectStream.close();
             byteStream.close();
             //System.out.println(new String(buildPacket(data)));
-            server.sendData(buildPacket(data), player.getIpAddress(), player.getPort());
+            server.sendDataTCP(buildPacket(data), clientSocket);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,10 +72,11 @@ public class Packet01Login extends Packet {
         String header = String.format("%02d%02d", super.packetId, loginPacketType.getLoginPackedId());
         byte[] headerBytes = header.getBytes();
 
+        packetData = new byte[headerBytes.length + data.length];
+        System.arraycopy(headerBytes, 0, packetData, 0, headerBytes.length);
+
         switch (loginPacketType){
-            case CONNECT -> {
-                packetData = new byte[headerBytes.length + data.length];
-                System.arraycopy(headerBytes, 0, packetData, 0, headerBytes.length);
+            case CONNECT, DISCONNECT -> {
                 System.arraycopy(data, 0, packetData, headerBytes.length, data.length);
             }
         }

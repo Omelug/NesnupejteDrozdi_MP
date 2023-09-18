@@ -1,6 +1,7 @@
 package org.drozdi.levels.level3;
 
 import lombok.Data;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

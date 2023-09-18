@@ -1,16 +1,13 @@
 package org.drozdi.levels.level3;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import lombok.Data;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.client.PlayerMP;
-
 import org.drozdi.levels.level3.walls.Slug;
 import org.drozdi.levels.level3.walls.Tower;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
 
 @Data
 public class Bullet {

@@ -3,13 +3,15 @@ package org.drozdi.net;
 import lombok.Getter;
 import lombok.Setter;
 import org.drozdi.levels.level3.client.GameClient;
-import org.drozdi.levels.level3.server.GameServer;
 import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.GameServer;
 
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.List;
 
 public abstract class Packet {
+    public abstract void writeDataTCP(GameServer server, Socket clientSocket);
     public static enum PacketType {
         INVALID(-1),PING(00),LOGIN(01), CHAT(02),MAP(03), PLAYER(04);
 
@@ -24,7 +26,9 @@ public abstract class Packet {
     public Packet(int packetId) {
         this.packetId = (byte) packetId;
     }
-    public abstract void writeData(GameClient client);
+
+    public abstract void writeDataTCP(GameClient client);
+    public abstract void writeDataUDP(GameClient client);
     public abstract void writeData(GameServer server, InetAddress clientAddress, int clientPort);
     public void writeData(GameServer server, PlayerMP playerMP){
         writeData(server, playerMP.getIpAddress(), playerMP.getPort());

@@ -1,6 +1,7 @@
 package org.drozdi.levels.level3.walls;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.drozdi.levels.level3.FileManager_lvl3;
 import org.drozdi.levels.level3.Panel_level3;
 import org.drozdi.levels.level3.Wall;

@@ -2,8 +2,8 @@ package org.drozdi.game;
 
 import lombok.Getter;
 import lombok.Setter;
-import java.awt.Point;
-import java.awt.Rectangle;
+
+import java.awt.*;
 
 public class RelativeSize {
 	@Getter
