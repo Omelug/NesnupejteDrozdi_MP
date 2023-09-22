@@ -2,7 +2,7 @@ package org.drozdi.levels.level3.walls;
 
 
 import org.drozdi.levels.level3.FileManager_lvl3;
-import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.GamePanel;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 
@@ -12,7 +12,7 @@ public class Hedgehog extends Wall {
 		super(x, y);
 	}
 	@Override
-	public void draw(Panel_level3 panel) {
+	public void draw(GamePanel panel) {
 		drawOnScreen(FileManager_lvl3.hedgehog, panel);
 	}
 

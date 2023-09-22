@@ -4,29 +4,27 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.Synchronized;
-import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.Bullet;
 import org.drozdi.levels.level3.FileManager_lvl3;
-import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.GamePanel;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.server.HitBoxHelper;
 import org.drozdi.levels.level3.walls.Checkpoint;
+import org.drozdi.net.NetSettings;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.InetAddress;
+import java.net.Socket;
 
 @Data
 public class PlayerMP {
     private String name;
-    @Getter(onMethod_={@Synchronized("position")}) @Setter(onMethod_={@Synchronized("position")})
     private Point2D.Double position;
     private Point2D.Double size;
-    private InetAddress ipAddress;
-    private int port;
     private Checkpoint checkpoint;
     private boolean left, right, up, down;
     private boolean onGround;
@@ -37,22 +35,22 @@ public class PlayerMP {
     private int shot;
     private boolean shooting;
     private long lastUpdated;
+    private Socket clientSocket;
+    private int UDPPort = NetSettings.defaultClientListeningUDPPort;
 
     public PlayerMP(String name){
         this.name = name;
-        position = HitBoxHelper.defaultPosition;
+        position = new Point2D.Double( HitBoxHelper.defaultPositionX, HitBoxHelper.defaultPositionY);
         size = new Point2D.Double(1, 1);
     }
 
-    public PlayerMP(String name, InetAddress ipAddress, int port) {
+    public PlayerMP(String name, Socket clientSocket,int UDPPort) {
         this(name);
-        this.ipAddress = ipAddress;
-        this.port = port;
-        position = HitBoxHelper.defaultPosition;
-        size = new Point2D.Double(0.9, 0.9);
+        this.clientSocket = clientSocket;
+        this.UDPPort = UDPPort;
         lastUpdated = System.currentTimeMillis();
     }
-    public void draw(Graphics2D g2d, Panel_level3 panel) {
+    public void draw(Graphics2D g2d, GamePanel panel) {
 
         if (Test.isHitBoxPlayer()) {
             g2d.setColor(Color.green);
@@ -71,13 +69,13 @@ public class PlayerMP {
         }
     }
 
-    private void drawPlayer(Graphics2D g2d, BufferedImage image, Panel_level3 panel) {
+    private void drawPlayer(Graphics2D g2d, BufferedImage image, GamePanel panel) {
         Rectangle2D.Double hitBox = getHitBox(panel);
         g2d.drawImage( image, (int) (hitBox.x * panel.getCellSize()), (int) (hitBox.y  * panel.getCellSize()), (int) (size.x * panel.getCellSize()), (int) (size.y* panel.getCellSize()), null);
     }
 
 
-    public void drawClientPlayer(Graphics2D g2d, Panel_level3 panel) {
+    public void drawClientPlayer(Graphics2D g2d, GamePanel panel) {
         if (panel.getScreen().intersects(getHitBox(panel))) {
             g2d.setColor(Color.cyan);
             FontMetrics fontMetrics = g2d.getFontMetrics();
@@ -93,14 +91,14 @@ public class PlayerMP {
         }
     }
 
-    public Rectangle2D.Double getHitBox(Panel_level3 panel){
+    public Rectangle2D.Double getHitBox(GamePanel panel){
         return new Rectangle2D.Double(position.x - panel.getShift().x, position.y, size.x, size.y);
     }
-    @Synchronized("position")
+    //@Synchronized("position")
     public Rectangle2D.Double getHitBoxServer(){
         return new Rectangle2D.Double(position.x, position.y, size.x, size.y);
     }
-    @Synchronized("position")
+    //@Synchronized("position")
     public void updatePosition(HitBoxHelper hitBoxHelper) {
         long delta = System.currentTimeMillis() - lastUpdated;
         double deltaDouble = (double) delta/10e3;
@@ -241,7 +239,14 @@ public class PlayerMP {
     }
 
     public String toStringServer() {
-        return name + "{"+ipAddress+":"+port +", position["+position.x+";"+ position.y +"], "+getMove()+"}";
+        return name + "{"+getIp()+":"+ clientSocket.getPort() +", position["+position.x+";"+ position.y +"], "+getMove()+"}";
+    }
+
+    public InetAddress getIp(){
+        return clientSocket.getInetAddress();
+    }
+    public int getTCPPort(){
+        return clientSocket.getPort();
     }
 
     private String getMove() {

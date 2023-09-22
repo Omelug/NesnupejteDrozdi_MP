@@ -6,6 +6,8 @@ import org.drozdi.game.FileManager;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.RelativeSize;
 import org.drozdi.game.Window;
+import org.drozdi.levels.level3.Level3;
+import org.drozdi.levels.level3.client.GameClient;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;
@@ -28,10 +30,10 @@ import java.time.LocalTime;
 import static java.lang.Thread.currentThread;
 
 public class Level0 {
-	private Window window;
-	private Thread thread;
-	private FileManager_lvl0 fileManagerLvl0 = new FileManager_lvl0();
-	private JLabel background;
+	private final Window window;
+	private final Thread thread;
+	private final FileManager_lvl0 fileManagerLvl0 = new FileManager_lvl0();
+	private final JLabel background;
 	private static JButton checkConnection;
 	private static JButton connectBtn;
 
@@ -138,10 +140,10 @@ public class Level0 {
 		JTextField newIpAddress = new JTextField();
 		newIpAddress.setBounds(RelativeSize.percentageX(5, statistics.getWidth()), 300, RelativeSize.percentageX(50, statistics.getWidth()), 20);
 		statistics.add(newIpAddress);
-		newIpAddress.setText(String.valueOf(NesnupejteDrozdi.getClient().getIpAddress()));
+		newIpAddress.setText(String.valueOf(GameClient.getServerIp()));
 		newIpAddress.addActionListener(e -> {
 			try {
-				NesnupejteDrozdi.getClient().setIpAddress(InetAddress.getByName(newIpAddress.getText()));
+				GameClient.setServerIp(InetAddress.getByName(newIpAddress.getText()));
 			} catch (UnknownHostException ex) {
 				ex.printStackTrace();
 			}
@@ -150,19 +152,19 @@ public class Level0 {
 		JTextField newUDPPort = new JTextField();
 		newUDPPort.setBounds(RelativeSize.percentageX(55, statistics.getWidth()), 300,RelativeSize.percentageX(20, statistics.getWidth()), 20);
 		statistics.add(newUDPPort);
-		newUDPPort.setText(String.valueOf(NesnupejteDrozdi.getClient().getPortUDP()));
+		newUDPPort.setText(String.valueOf(GameClient.getServerUDPPort()));
 		((AbstractDocument) newUDPPort.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
 		newUDPPort.addActionListener(e -> {
-			NesnupejteDrozdi.getClient().setPortUDP(Integer.parseInt(newUDPPort.getText()));
+			GameClient.setServerUDPPort(Integer.parseInt(newUDPPort.getText()));
 		});
 
 		JTextField newTCPPort = new JTextField();
 		newTCPPort.setBounds(RelativeSize.percentageX(55, statistics.getWidth()), 320,RelativeSize.percentageX(20, statistics.getWidth()), 20);
 		statistics.add(newTCPPort);
-		newTCPPort.setText(String.valueOf(NesnupejteDrozdi.getClient().getPortTCP()));
+		newTCPPort.setText(String.valueOf(GameClient.getServerTCPPort()));
 		((AbstractDocument) newTCPPort.getDocument()).setDocumentFilter(new IntegerDocumentFilter());
 		newTCPPort.addActionListener(e -> {
-			NesnupejteDrozdi.getClient().setPortTCP(Integer.parseInt(newTCPPort.getText()));
+			GameClient.setServerTCPPort(Integer.parseInt(newTCPPort.getText()));
 		});
 
 		checkConnection = new JButton();

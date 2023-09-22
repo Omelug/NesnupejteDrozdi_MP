@@ -14,7 +14,8 @@ import java.net.InetAddress;
 
 @Data
 public class HitBoxHelper {
-    public static final Point2D.Double defaultPosition = new Point2D.Double(13, 10);
+    public static final double defaultPositionX = 13;
+    public static final double defaultPositionY = 10;
     private Rectangle mapSize;
     private final GameServer gameServer;
 
@@ -22,7 +23,6 @@ public class HitBoxHelper {
 
     public HitBoxHelper(GameServer gameServer){
         this.gameServer = gameServer;
-        mapHelper.loadMap();
     }
 
     public void update() {
@@ -143,10 +143,10 @@ public class HitBoxHelper {
         return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
-    public PlayerMP getPlayerByIpAndPort(InetAddress address, int port) {
+    public PlayerMP getPlayerByIp(InetAddress ip) {
         PlayerMP foundPlayer = null;
         for (PlayerMP player : mapHelper.getPlayerList()) {
-            if (player.getIpAddress().equals(address) && player.getPort() == port) {
+            if (player.getIp().equals(ip)) {
                 foundPlayer = player;
                 break;
             }
@@ -156,7 +156,7 @@ public class HitBoxHelper {
 
     public void sendAllData() {
         for (PlayerMP player : mapHelper.getPlayerList()) {
-            new Packet04Player(Packet04Player.PlayerPacketType.NEXT_PLAYER).writeAllClients(getGameServer(), player);
+            new Packet04Player(Packet04Player.PlayerPacketType.NEXT_PLAYER).writeAllClientsUDP(getGameServer(), player);
         }
     }
 }

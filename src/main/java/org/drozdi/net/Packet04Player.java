@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Packet04Player extends Packet{
 
@@ -32,39 +33,33 @@ public class Packet04Player extends Packet{
 
     @Override
     public void writeDataUDP(GameClient client) {
-        switch (playerPacketType) {
-            case MOVE -> {
-                PlayerMP player = client.getPanelLevel3().getPlayer();
-                try {
-                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-                    ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
+        if (Objects.requireNonNull(playerPacketType) == PlayerPacketType.MOVE) {
+            PlayerMP player = GameClient.getPlayer();
+            try {
+                ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+                ObjectOutputStream objectStream = new ObjectOutputStream(byteStream);
 
-                    objectStream.writeObject(player.isUp());
-                    objectStream.writeObject(player.isRight());
-                    objectStream.writeObject(player.isDown());
-                    objectStream.writeObject(player.isLeft());
-                    objectStream.writeObject(player.isDown());
-                    objectStream.writeObject(player.isShooting());
+                objectStream.writeObject(player.isUp());
+                objectStream.writeObject(player.isRight());
+                objectStream.writeObject(player.isDown());
+                objectStream.writeObject(player.isLeft());
+                objectStream.writeObject(player.isDown());
+                objectStream.writeObject(player.isShooting());
 
-                    objectStream.flush();
-                    byte[] data = byteStream.toByteArray();
+                objectStream.flush();
+                byte[] data = byteStream.toByteArray();
 
-                    objectStream.close();
-                    byteStream.close();
-                    client.sendDataUDP(buildPacket(data));
+                objectStream.close();
+                byteStream.close();
+                client.sendDataUDP(buildPacket(data));
 
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    @Override
-    public void writeData(GameServer server, InetAddress clientAddress, int clientPort) {
-    }
-
-    public void writeData(GameServer server, InetAddress clientAddress, int clientPort, PlayerMP player) {
+    public void writeDataUDP(GameServer server, PlayerMP player) {
         switch (playerPacketType) {
             case NEXT_PLAYER, MOVE -> {
                 try {
@@ -78,7 +73,7 @@ public class Packet04Player extends Packet{
 
                     objectStream.flush();
                     byte[] data = byteStream.toByteArray();
-                    server.sendDataUDP(buildPacket(data), clientAddress, clientPort);
+                    server.sendDataUDP(buildPacket(data), player.getIp(), player.getUDPPort());
 
                     objectStream.close();
                     byteStream.close();
@@ -90,14 +85,15 @@ public class Packet04Player extends Packet{
         }
     }
 
-    public void writeAllClients(GameServer server, PlayerMP player) {
+    public void writeAllClientsUDP(GameServer server, PlayerMP player) {
         for (PlayerMP playerMP : server.getHitBoxHelper().getMapHelper().getPlayerList()){
-            if (player.getIpAddress().equals(playerMP.getIpAddress()) && player.getPort() == playerMP.getPort()) {
+            if (player.getIp().equals(playerMP.getIp()) && player.getUDPPort() == playerMP.getUDPPort()) {
                 playerPacketType = PlayerPacketType.MOVE;
             }else{
+                GameServer.logger.TCPInfoSend("another player move");
                 playerPacketType = PlayerPacketType.NEXT_PLAYER;
             }
-            writeData(server, playerMP.getIpAddress(), playerMP.getPort(), player);
+            writeDataUDP(server, player);
         }
     }
 
@@ -115,18 +111,15 @@ public class Packet04Player extends Packet{
 
     public enum PlayerPacketType {
         INVALID(00),MOVE(01), NEXT_PLAYER(02);
-
-        @Getter @Setter
-        private int playerPacketId;
-
+        @Getter
+        private final int playerPacketId;
         PlayerPacketType(int playerPacketId) {
             this.playerPacketId = playerPacketId;
-        };
+        }
 
         private int getPlayerPacketType() {
             return playerPacketId;
-        };
-
+        }
     }
 
     public static PlayerPacketType lookupPlayerPacket(int id){

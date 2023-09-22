@@ -6,19 +6,17 @@ import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.GameServer;
 
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
 public abstract class Packet {
-    public abstract void writeDataTCP(GameServer server, Socket clientSocket);
-    public static enum PacketType {
+    public enum PacketType {
         INVALID(-1),PING(00),LOGIN(01), CHAT(02),MAP(03), PLAYER(04);
 
-        @Getter @Setter
-        private int packetId;
+        @Getter
+        private final int packetId;
 
-        private PacketType(int packetId) {
+        PacketType(int packetId) {
             this.packetId = packetId;
         };
     }
@@ -29,13 +27,13 @@ public abstract class Packet {
 
     public abstract void writeDataTCP(GameClient client);
     public abstract void writeDataUDP(GameClient client);
-    public abstract void writeData(GameServer server, InetAddress clientAddress, int clientPort);
-    public void writeData(GameServer server, PlayerMP playerMP){
-        writeData(server, playerMP.getIpAddress(), playerMP.getPort());
+    public abstract void writeDataTCP(GameServer server, Socket clientSocket);
+    public void writeDataTCP(GameServer server, PlayerMP playerMP){
+        writeDataTCP(server, playerMP.getClientSocket());
     }
     public void writeDataList(GameServer server, List<PlayerMP> list) {
         for(PlayerMP playerMP : list){
-            writeData(server, playerMP);
+            writeDataTCP(server, playerMP);
         }
     }
 

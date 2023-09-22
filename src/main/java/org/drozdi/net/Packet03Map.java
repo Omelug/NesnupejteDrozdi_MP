@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.server.GameServer;
-
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class Packet03Map extends Packet{
@@ -21,7 +19,8 @@ public class Packet03Map extends Packet{
     public void writeDataTCP(GameClient client) {
         switch (mapPacketType) {
             case START -> {
-                client.sendDataTCP(buildPacket("".getBytes()));
+                GameClient.getLogger().TCPInfoSend("getMap START");
+                client.sendDataTCP(buildPacket(null));
             }
         }
     }
@@ -30,12 +29,9 @@ public class Packet03Map extends Packet{
     public void writeDataUDP(GameClient client) {}
 
     @Override
-    public void writeData(GameServer server, InetAddress clientAddress, int clientPort) {}
-
-    @Override
     public void writeDataTCP(GameServer server,Socket clientSocket) {
         switch (mapPacketType) {
-            case START -> {
+            case START, STOP -> {
                 server.sendDataTCP(buildPacket(null), clientSocket);
             }
             default -> {
@@ -82,9 +78,6 @@ public class Packet03Map extends Packet{
         };
         private int getMapPacketType() {
             return mapPacketId;
-        };
-        public String getMapPacketTypeString() {
-            return String.valueOf(mapPacketId);
         };
 
     }

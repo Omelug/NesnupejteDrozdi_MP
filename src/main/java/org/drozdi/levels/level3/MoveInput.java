@@ -5,8 +5,8 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class MoveInput extends KeyAdapter{
-	private final Panel_level3 panel;
-	public MoveInput(Panel_level3 panel) {
+	private final GamePanel panel;
+	public MoveInput(GamePanel panel) {
 		this.panel = panel;
 	}
 	@Override

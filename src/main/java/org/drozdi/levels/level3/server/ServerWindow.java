@@ -6,6 +6,8 @@ import org.drozdi.levels.level3.client.PlayerMP;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Set;
 
 public class ServerWindow extends JFrame {
@@ -33,8 +35,15 @@ public class ServerWindow extends JFrame {
         setSize(400, 300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("Server stats: TPS: " + TPS);
+
         JScrollPane scrollPane = new JScrollPane(playerList);
         getContentPane().add(scrollPane, BorderLayout.CENTER);
+
+        JButton disconnectBtn = new JButton();
+        disconnectBtn.setText("Disconnect all players");
+        getContentPane().add(disconnectBtn, BorderLayout.BEFORE_FIRST_LINE);
+        disconnectBtn.addActionListener(e -> gameServer.disconnectAll());
+
     }
 
     private void updatePlayerList() {

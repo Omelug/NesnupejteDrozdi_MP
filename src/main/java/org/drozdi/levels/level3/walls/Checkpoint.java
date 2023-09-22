@@ -2,7 +2,7 @@ package org.drozdi.levels.level3.walls;
 
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.FileManager_lvl3;
-import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.GamePanel;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 
@@ -15,7 +15,7 @@ public class Checkpoint extends Wall {
 	}
 
 	@Override
-	public Rectangle getHitBox(Panel_level3 panel) {
+	public Rectangle getHitBox(GamePanel panel) {
 		return new Rectangle((int) (getPosition().x - panel.getShift().x), getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
 	}
 	@Override
@@ -32,7 +32,7 @@ public class Checkpoint extends Wall {
 		}
 	}
 
-	public void draw(Panel_level3 panel) {
+	public void draw(GamePanel panel) {
 		drawOnScreen(FileManager_lvl3.checkpoint, panel);
 
 		if (Test.isHitBoxCheckpoint()) {

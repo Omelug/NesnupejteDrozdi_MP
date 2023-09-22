@@ -2,6 +2,7 @@ package org.drozdi.net;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.drozdi.levels.level3.GamePanel;
 import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.GameServer;
@@ -9,7 +10,6 @@ import org.drozdi.levels.level3.server.GameServer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class Packet01Login extends Packet {
@@ -24,27 +24,29 @@ public class Packet01Login extends Packet {
 
     @Override
     public void writeDataTCP(GameServer server, Socket clientSocket) {
-
+        switch (loginPacketType) {
+            case DISCONNECT -> {
+                server.sendDataTCP(buildPacket(null), clientSocket);
+            }
+        }
     }
 
     @Override
     public void writeDataTCP(GameClient client) {
         switch (loginPacketType) {
-            case CONNECT, DISCONNECT -> {
-                client.sendDataTCP(
-                        buildPacket(
-                                client.getPanelLevel3().getPlayer().getName().getBytes()
-                        ));
+            case CONNECT -> {
+                String loginMessage = GamePanel.getPlayer().getName() + ":" + GameClient.getListeningUDPPort();
+                client.sendDataTCP(buildPacket(loginMessage.getBytes()));
+            }
+            case DISCONNECT -> {
+                GameClient.getLogger().TCPInfoSend("Disconnect request");
+                client.sendDataTCP(buildPacket(null));
             }
         }
     }
 
     @Override
     public void writeDataUDP(GameClient client) {}
-
-    @Override
-    public void writeData(GameServer server, InetAddress clientAddress, int clientPort) {
-    }
 
     public void sendToPlayer(GameServer server, PlayerMP player, Socket clientSocket) {
         try {
@@ -68,7 +70,10 @@ public class Packet01Login extends Packet {
 
 
     public byte[] buildPacket(byte[] data) {
-        byte[] packetData = new byte[0];
+        if (data == null){
+            data = "".getBytes();
+        }
+        byte[] packetData;
         String header = String.format("%02d%02d", super.packetId, loginPacketType.getLoginPackedId());
         byte[] headerBytes = header.getBytes();
 

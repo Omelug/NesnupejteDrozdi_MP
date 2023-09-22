@@ -20,7 +20,7 @@ public class Wall {
 		this(x , y , 1, 1);
 	}
 
-	public Rectangle getHitBox(Panel_level3 panel) {
+	public Rectangle getHitBox(GamePanel panel) {
 		return new Rectangle((int) (position.x - panel.getShift().x), position.y, (int) size.x, (int) size.y);
 	}
 
@@ -28,22 +28,22 @@ public class Wall {
 		return new Rectangle2D.Double( position.x , position.y, size.x, size.y);
 	}
 
-	public void draw(Panel_level3 panel) {
+	public void draw(GamePanel panel) {
 		drawOnScreen(FileManager_lvl3.wall, panel);
 		panel.getG2d().setColor(Color.yellow);
 		panel.drawHitBox(getHitBox(panel));
 	}
-	public void draw(Image image, Panel_level3 panel) {
+	public void draw(Image image, GamePanel panel) {
 		drawOnScreen(image, panel);
 	}
-	protected void drawWall(Image image, Panel_level3 panel) {
+	protected void drawWall(Image image, GamePanel panel) {
 		Rectangle hitBox = getHitBox(panel);
 		panel.getG2d().drawImage(image,
 				hitBox.x * panel.getCellSize(),  hitBox.y * panel.getCellSize(),
 				(int) size.x * panel.getCellSize(), (int) size.y * panel.getCellSize(),
 				null);
 	}
-	public void drawOnScreen(Image image, Panel_level3 panel) {
+	public void drawOnScreen(Image image, GamePanel panel) {
 		if (panel.getScreen().intersects(getHitBox(panel))) {
 			drawWall(image, panel);
 		}

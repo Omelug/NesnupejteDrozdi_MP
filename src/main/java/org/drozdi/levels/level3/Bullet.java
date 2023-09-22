@@ -49,7 +49,7 @@ public class Bullet {
 		speed = new Point2D.Double.Double(proportion * x*1.25, proportion * y*1.25);
 	}
 
-	public Rectangle getHitBox(Panel_level3 panel) {
+	public Rectangle getHitBox(GamePanel panel) {
 		return new Rectangle((int) (position.x - panel.getShift().x), (int) (position.y), size.x, size.y);
 	}
 	public Rectangle getHitBoxServer() {
@@ -61,7 +61,7 @@ public class Bullet {
 		position.y += speed.y;
 	}
 
-	void draw(Graphics2D g2d, Panel_level3 panel) {
+	void draw(Graphics2D g2d, GamePanel panel) {
 		g2d.setColor(Color.cyan);
 		switch (bulletType) {
 			case PLAYER ->  {

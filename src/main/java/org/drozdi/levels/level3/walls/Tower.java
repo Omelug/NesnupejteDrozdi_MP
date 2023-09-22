@@ -3,7 +3,7 @@ package org.drozdi.levels.level3.walls;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.Bullet;
 import org.drozdi.levels.level3.FileManager_lvl3;
-import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.GamePanel;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.HitBoxHelper;
@@ -19,7 +19,7 @@ public class Tower extends Wall {
 	}
 
 	@Override
-	public Rectangle getHitBox(Panel_level3 panel) {
+	public Rectangle getHitBox(GamePanel panel) {
 		return new Rectangle((int) (getPosition().x - panel.getShift().x + 1/2),
 				getPosition().y, (int) (getSize().x- 1), (int) getSize().y);
 	}
@@ -32,7 +32,7 @@ public class Tower extends Wall {
 		}
 	}
 	@Override
-	public void draw(Panel_level3 panel) {
+	public void draw(GamePanel panel) {
 		Rectangle hitBox = getHitBox(panel);
 		if (panel.getScreen().intersects(hitBox)) { //TODO hitbox je maly, takze to bude platit vzdy, zkontrolovat u dalsich
 			panel.getG2d().drawImage( FileManager_lvl3.tower,
@@ -47,7 +47,7 @@ public class Tower extends Wall {
 			}
 		}
 	}
-	public void drawLine(PlayerMP player, Panel_level3 panel) {
+	public void drawLine(PlayerMP player, GamePanel panel) {
 		panel.getG2d().setColor(Color.orange);
 		panel.getG2d().drawLine(
 				(int) ((player.getPosition().x + player.getSize().x / 2) * panel.getCellSize()),

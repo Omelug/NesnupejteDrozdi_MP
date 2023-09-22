@@ -3,9 +3,9 @@ package org.drozdi.levels.level3;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.RelativeSize;
 import org.drozdi.game.Window;
+import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.walls.Key;
 
 import javax.swing.*;
@@ -16,20 +16,21 @@ import java.util.Set;
 public class Level3 {
 	@Getter @Setter
 	private static Thread thread;
-	private boolean end = true;
-
-	private static Panel_level3 gamePanel;
 	private Set<Key> savedKeyList;
 	private int keyCount = 0;
 
 	private Window window;
 	private JLabel infoLabel;
 
+	@Getter
+	private static GameClient client;
+	@Getter
+	private static GamePanel gamePanel;
+
 	private Object lock = new Object();
 
 	public Level3(Window window) {
 		this.window = window;
-
 		window.setTitle("Šňupejte droždí  - Level 3");
 		infoLabel = new JLabel();
 
@@ -47,39 +48,16 @@ public class Level3 {
 		window.setVisible(true);
 		window.setFocusable(true);
 		window.add(window.answerPanel);
+		window.setFocusable(true);
+		window.requestFocus();
 
-		FileManager_lvl3.loadResources();
-
-		NesnupejteDrozdi.getClient().setPanelLevel3(gamePanel);
-		NesnupejteDrozdi.getClient().getMap(); //TODO pockat na
-		window.repaint();
-
-		do {
-			gamePanel = new Panel_level3(this);
-			window.setFocusable(true);
-			window.requestFocus();
-			window.add(gamePanel);
-			window.addKeyListener(new MoveInput(gamePanel));
-			//thread = Thread.currentThread();
-			synchronized (lock) {
-				try {
-					lock.wait();
-				} catch (InterruptedException ex) {
-					System.out.println("ERROR -- Level3");
-				}
-			}
-		} while (!end);
-
+		client = new GameClient();
+		client.start();
+		gamePanel = new GamePanel(this);
+		window.add(gamePanel);
+		window.addKeyListener(new MoveInput(gamePanel));
+		window.answerPanel.repaint();
+		gamePanel.start();
 		System.out.println("Level3 -- END " + Thread.currentThread());
 	}
-
-	/**public void saveTime() {
-		time = System.currentTimeMillis() - time;
-		if (NesnupejteDrozdi.mapTimeList[map] > time) {
-			NesnupejteDrozdi.mapTimeList[map]= time;
-		}
-		map++;
-	}**/
-
-
 }

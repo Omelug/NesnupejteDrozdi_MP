@@ -12,6 +12,7 @@ import org.drozdi.levels.level3.walls.*;
 
 import java.awt.image.BufferedImage;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,11 +35,11 @@ public class MapHelper {
     private ArrayList<Key> keys = new ArrayList<>();
 
     //TODO offline game
-    @Synchronized
+    /**@Synchronized
     private void loadMap(int mapNumber) {
         BufferedImage map = FileManager.loadResource("Level3/maps/map" + mapNumber + ".bmp");
         loadMap(map);
-    }
+    }**/
     public void loadMap() {
         BufferedImage map = FileManager.loadResource("client_data/maps/server_map.bmp");
         loadMap(map);
@@ -112,7 +113,7 @@ public class MapHelper {
     }
 
     public boolean playerConnected(HitBoxHelper hitBoxHelper, InetAddress address, int port) {
-        PlayerMP player = hitBoxHelper.getPlayerByIpAndPort(address, port);
+        PlayerMP player = hitBoxHelper.getPlayerByIp(address);
         if (player != null) {
             System.out.println("Player " + player.getName() + " is connected");
             return true;
@@ -120,11 +121,11 @@ public class MapHelper {
         return false;
     }
 
-    public void removePlayer(InetAddress address, int port) {
+    public void removePlayer(Socket clientSocket) {
         Iterator<PlayerMP> iterator = playerList.iterator();
         while (iterator.hasNext()) {
             PlayerMP player = iterator.next();
-            if (player.getIpAddress().equals(address) && player.getPort() == port) {
+            if (player.getClientSocket().equals(clientSocket)) {
                 GameServer.getLogger().playerDisconnect(player);
                 iterator.remove();
             }

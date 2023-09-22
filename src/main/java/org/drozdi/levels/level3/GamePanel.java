@@ -1,53 +1,52 @@
 package org.drozdi.levels.level3;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.RelativeSize;
 import org.drozdi.game.Test;
-import org.drozdi.levels.level3.client.GameClient;
 import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.ServerSeparated;
 import org.drozdi.levels.level3.walls.*;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
-@Data
-public class Panel_level3 extends JPanel{
-	private PlayerMP player;
-	private Timer timer;
-
+public class GamePanel extends JPanel{
+	@Getter @Setter
+	private static PlayerMP player;
+	@Getter
 	private Point2D.Double shift;
 	private Point screenPosition;
 
 	private long lastUpdateTime = System.nanoTime();
+	@Getter
 	private double fps = 0;
-	private boolean end;
+	@Setter
+	boolean running = false;
+	@Getter
 	private int cellSize;
+	@Getter
 	private Rectangle screen;
+	@Getter
 	private Level3 level3;
+	@Getter
 	private Graphics2D g2d;
+	@Getter
 	private Set<Wall> wallsOnScreen = new HashSet<>();
+	@Getter
 	private MapHelper mapHelper = new MapHelper();
-	private GameClient client;
 
-	public Panel_level3(Level3 level3) {
+	public GamePanel(Level3 level3) {
 		this.level3 = level3;
-		client = NesnupejteDrozdi.getClient();
-		client.setPanelLevel3(this);
-
 		screenPosition = new Point(13, 10);
-		end = false;
-
 		setBackground(new Color(45, 25, 33));
 		setBounds(RelativeSize.rectangle(0, 0, 100, 85));
 		setDoubleBuffered(true);
@@ -58,24 +57,27 @@ public class Panel_level3 extends JPanel{
 		shift = new Point2D.Double(0, 0);
 		screen = new Rectangle(0, 0, getWidth(), getHeight());
 		mapHelper.loadMap();
-		level3.setEnd(true);
+		Level3.getClient().login();
+	}
+	public void start() {
+		System.out.println("Panel started");
+		running = true;
+		while (running) {
+			long startTime = System.currentTimeMillis();
 
-		timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					update();
-					repaint();
-				} catch (Exception e) {
-					timer.cancel();
-					System.out.println("END with exception:");
-					e.printStackTrace();
-				}
+			update();
+			repaint();
+
+			long endTime = System.currentTimeMillis();
+			long elapsedTime = endTime - startTime;
+			long sleepDuration = Math.max(5 - elapsedTime, 0); //200 fps and packet cycles max
+			try {
+				Thread.sleep(sleepDuration);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		}, 50, 15);
-		client.login();
-		level3.getWindow().repaint();
+		}
+		System.out.println("Panel deleted");
 	}
 
 	private void update() {
@@ -176,16 +178,15 @@ public class Panel_level3 extends JPanel{
 			case 's' ->	player.setDown(false);
 			case 'd' -> player.setRight(false);
 			case 'r' -> restart();
-			case 't' -> end();
+			case 't' -> 	{Level3.getClient().disconnect(true);}
 			case KeyEvent.VK_SPACE -> player.setShooting(false);
 		}
-		NesnupejteDrozdi.getClient().move();
+		Level3.getClient().move();
 	}
-
+/**
 	public void end() {
-		client.disconnect();
+		Level3.getClient().disconnect();
 		updateInfo();
-		//TODO send disconnect server
 		synchronized (level3.getLock()) {
 			try {
 				if (!end) {
@@ -197,17 +198,16 @@ public class Panel_level3 extends JPanel{
 			} catch (Exception e) {
 				System.out.println("ERROR  -- END " + Thread.currentThread());
 			}
-
 		}
-	}
+	}**/
 
 	public void restart() {
-		//TODO zkontrolovat restart
-		System.out.println("RESTART");
+		//TODO reconnect
+		/**System.out.println("RESTART");
 		level3.setSavedKeyList(new HashSet<>());
 		level3.getSavedKeyList().addAll(mapHelper.getKeys());
 		level3.setEnd(false);
-		end();
+		end();**/
 	}
 
 	public void keyPressed(KeyEvent e) {
@@ -218,7 +218,7 @@ public class Panel_level3 extends JPanel{
 			case 'd' -> player.setRight(true);
 			case KeyEvent.VK_SPACE -> player.setShooting(true);
 		}
-		NesnupejteDrozdi.getClient().move();
+		Level3.getClient().move();
 	}
 
 	public void updateClientShift() {

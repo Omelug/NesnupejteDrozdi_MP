@@ -3,7 +3,7 @@ package org.drozdi.levels.level3.walls;
 import lombok.Getter;
 import lombok.Setter;
 import org.drozdi.levels.level3.FileManager_lvl3;
-import org.drozdi.levels.level3.Panel_level3;
+import org.drozdi.levels.level3.GamePanel;
 import org.drozdi.levels.level3.Wall;
 import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.GameServer;
@@ -37,7 +37,7 @@ public class Door extends Wall {
 		}
 	}
 
-	public void draw(Panel_level3 panel) {
+	public void draw(GamePanel panel) {
 		if (panel.getScreen().intersects(getHitBox(panel))) {
 			if (open) {
 				drawWall(FileManager_lvl3.door, panel);

@@ -15,24 +15,21 @@ public class Window extends JFrame {
 	
 	ImageIcon image = FileManager.loadImageIcon("drozdi.png");
 	public Window() {
-		//setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setUndecorated(GameSettings.delete_title);
 		addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
-				// Update the properties after the frame has been resized
 				//TODO
 				windowWidth = getWidth();
 				windowHeight = getHeight();
 				RelativeSize.setMaximum(windowWidth, windowHeight);
 				setVisible(true);
 				repaint();
-				System.out.println("Resized to [" + windowWidth +", "+ windowHeight+"]");
 			}
 		});
-		setVisible(true);
 		setExtendedState(Frame.MAXIMIZED_BOTH);
 		RelativeSize.setMaximum(windowWidth, windowHeight);
+		setVisible(true);
 		setTitle("Nešňupejte droždí ");
 		setIconImage(image.getImage());
 		getContentPane().setBackground(Color.cyan);
