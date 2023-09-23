@@ -7,6 +7,7 @@ import org.drozdi.game.NesnupejteDrozdi;
 import org.drozdi.game.RelativeSize;
 import org.drozdi.game.Test;
 import org.drozdi.levels.level3.client.PlayerMP;
+import org.drozdi.levels.level3.server.HitBoxHelper;
 import org.drozdi.levels.level3.server.ServerSeparated;
 import org.drozdi.levels.level3.walls.*;
 import javax.swing.*;
@@ -222,8 +223,8 @@ public class GamePanel extends JPanel{
 	}
 
 	public void updateClientShift() {
-		//shift.x = getPlayer().getPosition().x - HitBoxHelper.defaultPosition.x;
-		//shift.y = getPlayer().getPosition().y - HitBoxHelper.defaultPosition.y;
+		shift.x = getPlayer().getPosition().x - HitBoxHelper.defaultPositionX;
+		shift.y = getPlayer().getPosition().y - HitBoxHelper.defaultPositionY;
 		//TODO update shift podle pozice
 	}
 

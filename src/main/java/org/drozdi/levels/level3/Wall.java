@@ -20,8 +20,8 @@ public class Wall {
 		this(x , y , 1, 1);
 	}
 
-	public Rectangle getHitBox(GamePanel panel) {
-		return new Rectangle((int) (position.x - panel.getShift().x), position.y, (int) size.x, (int) size.y);
+	public Rectangle2D.Double getHitBox(GamePanel panel) {
+		return new Rectangle2D.Double ((position.x - panel.getShift().x), position.y, (int) size.x, (int) size.y);
 	}
 
 	public Rectangle2D.Double getHitBoxServer() {
@@ -37,9 +37,9 @@ public class Wall {
 		drawOnScreen(image, panel);
 	}
 	protected void drawWall(Image image, GamePanel panel) {
-		Rectangle hitBox = getHitBox(panel);
+		Rectangle2D.Double hitBox = getHitBox(panel);
 		panel.getG2d().drawImage(image,
-				hitBox.x * panel.getCellSize(),  hitBox.y * panel.getCellSize(),
+						(int) (hitBox.x * panel.getCellSize()), (int) (hitBox.y * panel.getCellSize()),
 				(int) size.x * panel.getCellSize(), (int) size.y * panel.getCellSize(),
 				null);
 	}

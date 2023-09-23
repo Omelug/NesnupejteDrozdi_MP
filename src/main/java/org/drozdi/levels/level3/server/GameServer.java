@@ -121,7 +121,6 @@ public class GameServer extends Thread{
       while (true) {
         byte[] data = new byte[NetSettings.getMapChunkSize() +  NetSettings.getPacketHeaderSize()];
         DatagramPacket packet = new DatagramPacket(data, data.length);
-        System.out.println("UDP packet" + packet.getPort());
         try {
           socketUDP.receive(packet);
         } catch (IOException e) {
@@ -131,7 +130,7 @@ public class GameServer extends Thread{
         byte[] receivedData = packet.getData();
         String id = new String(receivedData).substring(0,4);
         Packet.PacketType packetType = Packet.lookupPacket(Integer.parseInt(id.substring(0,2)));
-        System.out.println(id + " "+ new String(receivedData));
+        //System.out.println(id + " "+ new String(receivedData));
         if (packetType == Packet.PacketType.PLAYER) {
           Packet04Player.PlayerPacketType playerPacketType = Packet04Player.lookupPlayerPacket(Integer.parseInt(id.substring(2, 4)));
           if (Objects.requireNonNull(playerPacketType) == Packet04Player.PlayerPacketType.MOVE) {
@@ -149,7 +148,6 @@ public class GameServer extends Thread{
 
               if (player == null) {
                 logger.msgUDP("" + "player is null");
-                return;
               }
               player.setUp((boolean) objectStream.readObject());
               player.setRight((boolean) objectStream.readObject());
@@ -169,11 +167,10 @@ public class GameServer extends Thread{
       }
     }catch (Exception e) {
       e.printStackTrace();
-    }/*finally {
+    }finally {
       logger.msgUDP("socketUDP close");
-      //socketUDP.close();
-    }*/
-    socketUDP.close();
+      socketUDP.close();
+    }
     logger.msgUDP("receiveUDP stopped");
   }
 

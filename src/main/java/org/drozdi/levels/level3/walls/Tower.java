@@ -9,6 +9,7 @@ import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.HitBoxHelper;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Tower extends Wall {
 	public static final double MAX_DISTANCE = 200; //TODO check
@@ -19,8 +20,8 @@ public class Tower extends Wall {
 	}
 
 	@Override
-	public Rectangle getHitBox(GamePanel panel) {
-		return new Rectangle((int) (getPosition().x - panel.getShift().x + 1/2),
+	public Rectangle2D.Double getHitBox(GamePanel panel) {
+		return new Rectangle2D.Double ((getPosition().x - panel.getShift().x + (double) 1/2),
 				getPosition().y, (int) (getSize().x- 1), (int) getSize().y);
 	}
 
@@ -33,13 +34,13 @@ public class Tower extends Wall {
 	}
 	@Override
 	public void draw(GamePanel panel) {
-		Rectangle hitBox = getHitBox(panel);
+		Rectangle2D.Double hitBox = getHitBox(panel);
 		if (panel.getScreen().intersects(hitBox)) { //TODO hitbox je maly, takze to bude platit vzdy, zkontrolovat u dalsich
-			panel.getG2d().drawImage( FileManager_lvl3.tower,
-					(int) (getHitBox(panel).x * panel.getCellSize() - (0.5 * panel.getCellSize())),
-					(getHitBox(panel).y) * panel.getCellSize(),
-					(int) getSize().x * panel.getCellSize(),
-					(int) getSize().y * panel.getCellSize(), null);
+			panel.getG2d().drawImage(FileManager_lvl3.tower,
+							(int) (getHitBox(panel).x * panel.getCellSize() - (0.5 * panel.getCellSize())),
+							(int) ((getHitBox(panel).y) * panel.getCellSize()),
+							(int) getSize().x * panel.getCellSize(),
+							(int) getSize().y * panel.getCellSize(), null);
 
 			if (Test.isHitBoxTower()) {
 				panel.getG2d().setColor(Color.green);

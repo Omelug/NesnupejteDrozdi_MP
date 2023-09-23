@@ -167,7 +167,7 @@ public class Panel extends JPanel implements Runnable {
 
 	}
 
-	int FPS = 120;
+	int FPS = 200;
 
 	@Override
 	public void run() {

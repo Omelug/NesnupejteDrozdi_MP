@@ -15,8 +15,8 @@ public class Checkpoint extends Wall {
 	}
 
 	@Override
-	public Rectangle getHitBox(GamePanel panel) {
-		return new Rectangle((int) (getPosition().x - panel.getShift().x), getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
+	public Rectangle2D.Double getHitBox(GamePanel panel) {
+		return new Rectangle2D.Double( (getPosition().x - panel.getShift().x), getPosition().y - 1, (int) getSize().x, (int) (getSize().y + 1));
 	}
 	@Override
 	public Rectangle2D.Double getHitBoxServer() {

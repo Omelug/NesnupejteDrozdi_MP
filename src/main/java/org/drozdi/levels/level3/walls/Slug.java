@@ -9,6 +9,7 @@ import org.drozdi.levels.level3.client.PlayerMP;
 import org.drozdi.levels.level3.server.HitBoxHelper;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 
 public class Slug extends Wall {
 	public static final double MAX_DISTANCE = 200; //TODO control
@@ -19,8 +20,8 @@ public class Slug extends Wall {
 	}
 
 	@Override
-	public Rectangle getHitBox(GamePanel panel) {
-	  	return new Rectangle((int) (getPosition().x - panel.getShift().x), getPosition().y, (int) getSize().x, (int) getSize().y);
+	public Rectangle2D.Double getHitBox(GamePanel panel) {
+	  	return new Rectangle2D.Double((getPosition().x - panel.getShift().x), getPosition().y, (int) getSize().x, (int) getSize().y);
 	}
 
 	@Override

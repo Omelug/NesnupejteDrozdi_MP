@@ -277,7 +277,7 @@ public class GameClient extends Thread {
 
   public void sendDataUDP(byte[] data){
     DatagramPacket packet = new DatagramPacket(data, data.length, serverIp, serverUDPPort);
-    System.out.println("RAW UDP DATA " + new String(data));
+    //System.out.println("RAW UDP DATA " + new String(data));
     try {
       socketUDP.send(packet);
     } catch (IOException e) {
