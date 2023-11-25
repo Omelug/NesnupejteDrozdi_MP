@@ -1,0 +1,53 @@
+package drozdi.levels.level3;
+
+import lombok.Data;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
+@Data
+public class Wall {
+	private Point position;
+	private Point2D.Double size;
+
+
+	public Wall(int x,int y,double sizeX,double sizeY) {
+		position = new Point(x, y);
+		size = new Point2D.Double (sizeX, sizeY);
+	}
+	public Wall(int x, int y) {
+		this(x , y , 1, 1);
+	}
+
+	public Rectangle2D.Double getHitBox(GamePanel panel) {
+		return new Rectangle2D.Double ((position.x - panel.getShift().x), position.y, (int) size.x, (int) size.y);
+	}
+
+	public Rectangle2D.Double getHitBoxServer() {
+		return new Rectangle2D.Double( position.x , position.y, size.x, size.y);
+	}
+
+	public void draw(GamePanel panel) {
+		drawOnScreen(FileManager_lvl3.wall, panel);
+		panel.getG2d().setColor(Color.yellow);
+		panel.drawHitBox(getHitBox(panel));
+	}
+	public void draw(Image image, GamePanel panel) {
+		drawOnScreen(image, panel);
+	}
+	protected void drawWall(Image image, GamePanel panel) {
+		Rectangle2D.Double hitBox = getHitBox(panel);
+		panel.getG2d().drawImage(image,
+						(int) (hitBox.x * panel.getCellSize()), (int) (hitBox.y * panel.getCellSize()),
+				(int) size.x * panel.getCellSize(), (int) size.y * panel.getCellSize(),
+				null);
+	}
+	public void drawOnScreen(Image image, GamePanel panel) {
+		if (panel.getScreen().intersects(getHitBox(panel))) {
+			drawWall(image, panel);
+		}
+	}
+
+}
+

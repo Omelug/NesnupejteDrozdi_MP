@@ -1,0 +1,7 @@
+#!/bin/bash
+
+java -javaagent:/home/kali/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/lib/idea_rt.jar=46103:/home/kali/.local/share/JetBrains/Toolbox/apps/intellij-idea-ultimate/bin \
+    -Dfile.encoding=UTF-8 \
+    -classpath /home/kali/IdeaProjects/NesnupejteDrozdi_MP/target/classes:/home/kali/.m2/repository/com/google/code/gson/gson/2.8.9/gson-2.8.9.jar:/home/kali/.m2/repository/org/projectlombok/lombok/1.18.26/lombok-1.18.26.jar:/home/kali/.m2/repository/commons-cli/commons-cli/1.4/commons-cli-1.4.jar \
+    drozdi.ClientSide.Client \
+    java Client --ip 127.0.0.1 --port
